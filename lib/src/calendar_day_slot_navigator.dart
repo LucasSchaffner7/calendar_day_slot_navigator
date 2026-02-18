@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+
 import 'selected_date_range_widget.dart';
 
 /// Enum for specifying different date selection behaviors.
@@ -73,6 +74,9 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Aspect ratio for the height of day boxes.
   final double? dayBoxHeightAspectRatio;
 
+  /// Locale used to localize weekday and month labels.
+  final Locale? locale;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator(
       {super.key,
@@ -106,7 +110,8 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       this.fontFamilyName,
       this.isGoogleFont = false,
       this.dayBorderWidth = 1.0,
-      this.dayBoxHeightAspectRatio = 9});
+      this.dayBoxHeightAspectRatio = 9,
+      this.locale = const Locale('en')});
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +139,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
         textStyle: textStyle,
         dayBorderWidth: dayBorderWidth,
         dayBoxHeightAspectRatio: dayBoxHeightAspectRatio,
+        locale: locale,
       );
     });
   }

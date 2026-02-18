@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mat_month_picker_dialog/mat_month_picker_dialog.dart';
 import 'package:sizer/sizer.dart';
+
 import 'calendar_day_slot_navigator.dart';
 import 'date_functions.dart';
 
@@ -62,6 +63,9 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Aspect ratio for the height of day boxes.
   final double? dayBoxHeightAspectRatio;
 
+  /// Locale used to localize weekday and month labels.
+  final Locale? locale;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -79,7 +83,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.dayDisplayMode,
       this.textStyle,
       this.dayBorderWidth,
-      this.dayBoxHeightAspectRatio});
+      this.dayBoxHeightAspectRatio,
+      this.locale});
 
   @override
   State<SelectedDateRangeWidget> createState() =>
@@ -104,18 +109,36 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   DateTime nullDateTime = DateTime(0001, 1, 1);
   DateTime selectedDate = DateTime.now();
   DateTime todayDate = DateTime.now();
+  late String _localeName =
+      (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale)
+          .toString();
 
   /// PageController to control the visible month.
   PageController pageController =
       PageController(viewportFraction: 1, keepPage: true);
   String? selectMonth;
   String? selectYear;
-  final currentMonth = DateFormat('MMMM').format(DateTime.now());
+  late final currentMonth =
+      DateFormat('MMMM', _localeName).format(DateTime.now());
 
   int slotLengthLocal = 0;
 
+  void _updateLocaleFromContext() {
+    final String resolvedLocale = (Localizations.maybeLocaleOf(context) ??
+            WidgetsBinding.instance.platformDispatcher.locale)
+        .toString();
+    if (resolvedLocale != _localeName) {
+      _localeName = resolvedLocale;
+    }
+  }
+
   @override
   void didUpdateWidget(covariant SelectedDateRangeWidget oldWidget) {
+    if (widget.locale != oldWidget.locale) {
+      _updateLocaleFromContext();
+      getDatesInMonth(selectedDate, MonthType.selected);
+    }
+
     if (widget.slotLength != oldWidget.slotLength) {
       slotLengthLocal = widget.slotLength!;
       nullDateTime = DateTime(0001, 1, 1);
@@ -129,6 +152,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   @override
   void initState() {
     super.initState();
+
+    _localeName = WidgetsBinding.instance.platformDispatcher.locale.toString();
 
     slotLengthLocal = widget.slotLength!;
 
@@ -164,6 +189,18 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
     );
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final String oldLocale = _localeName;
+    _updateLocaleFromContext();
+
+    if (oldLocale != _localeName && listDate.isNotEmpty) {
+      getDatesInMonth(selectedDate, MonthType.selected);
+    }
+  }
+
   /// Get all dates for the given month and organize them into weeks
   void getDatesInMonth(DateTime date, MonthType type) {
     listDate.clear();
@@ -178,7 +215,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
       dateSelected = DateTime.now().day;
     }
 
-    selectMonth = DateFormat("MMMM").format(date);
+    selectMonth = DateFormat("MMMM", _localeName).format(date);
 
     /// Set year tab text and dialog box initial values.
     year = date.year;
@@ -190,7 +227,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
     for (int i = 0; i <= difference.inDays; i++) {
       var currentDay = firstDayOfMonth.add(Duration(days: i));
       dates.add(currentDay);
-      weekDays.add(DateFormat('EEE').format(currentDay));
+      weekDays.add(DateFormat('EEE', _localeName).format(currentDay));
     }
 
     int pageLength = (dates.length / slotLengthLocal).ceil();
@@ -219,7 +256,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   /// Set the page index based on the selected date and update navigation flags.
   void setPage(DateTime date, MonthType type) {
     days = date.day;
-    dailyDate = DateFormat("d/M/yyyy").format(date);
+    dailyDate = DateFormat("d/M/yyyy", _localeName).format(date);
 
     switch (type) {
       case MonthType.selected:
@@ -387,6 +424,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               );
                             },
                             context: context,
+                            locale:
+                                Locale.fromSubtags(languageCode: _localeName),
                             firstDate: DateTime(1900, 1, 1),
                             lastDate: DateTime(2050, 12, 31),
                             initialDate: monthSelected ?? DateTime.now(),
@@ -398,7 +437,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               yearSelected = selected;
                               month = selected.month;
                               year = selected.year;
-                              selectMonth = DateFormat('MMMM').format(selected);
+                              selectMonth = DateFormat('MMMM', _localeName)
+                                  .format(selected);
                               getDatesInMonth(selected, MonthType.selected);
                             });
                           }
@@ -474,6 +514,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                 );
                               },
                               context: context,
+                              locale:
+                                  Locale.fromSubtags(languageCode: _localeName),
                               firstDate: DateTime(1900, 1, 1),
                               lastDate: DateTime(2050, 12, 31),
                               initialDate: yearSelected ?? DateTime.now(),
@@ -485,8 +527,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                 year = selected.year;
                                 getDatesInMonth(selected, MonthType.selected);
                                 monthSelected = selected;
-                                selectMonth =
-                                    DateFormat('MMMM').format(selected);
+                                selectMonth = DateFormat('MMMM', _localeName)
+                                    .format(selected);
                                 selectedDate = selected;
                                 widget.onDateSelect!(selectedDate);
                               });
@@ -594,7 +636,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                       padding: const EdgeInsets.only(
                                           left: 5, right: 5),
                                       child:
-                                          DateFormat('yyyy').format(date) ==
+                                          DateFormat('yyyy', _localeName)
+                                                      .format(date) ==
                                                   "0001"
                                               ? const SizedBox()
                                               : GestureDetector(
@@ -606,7 +649,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                             dateSelected =
                                                                 date.day;
                                                             dailyDate = DateFormat(
-                                                                    "d/M/yyyy")
+                                                                    "d/M/yyyy",
+                                                                    _localeName)
                                                                 .format(date);
                                                             if (widget
                                                                     .onDateSelect !=
@@ -626,7 +670,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                               children: [
                                                                 Text(
                                                                   DateFormat(
-                                                                          'EEE')
+                                                                          'EEE',
+                                                                          _localeName)
                                                                       .format(
                                                                           date),
                                                                   style: widget
@@ -761,7 +806,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                     // Adjusts the text to fit the box
                                                                     child: Text(
                                                                       DateFormat(
-                                                                              'EEE')
+                                                                              'EEE',
+                                                                              _localeName)
                                                                           .format(
                                                                               date),
                                                                       style: widget
