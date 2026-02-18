@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      locale: const Locale('de'),
+      locale: const Locale('fr'),
       supportedLocales: const [
         Locale('en'),
         Locale('fr'),
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // How many days do you want to show at a time
               dayBoxHeightAspectRatio: 5,
               // Set dynamic height of a day box
-              dayDisplayMode: DayDisplayMode.inDateBox,
+              dayDisplayMode: DayDisplayMode.outsideDateBox,
               // There are 2 types of design variants DayDisplayMode.outsideDateBox, DayDisplayMode.inDateBox
               activeColor: const Color(0xffb644ae),
               // Sets a background color for selected date.
@@ -94,44 +94,28 @@ class _MyHomePageState extends State<MyHomePage> {
               // Set day box border width
               monthYearSelectorPosition: MonthYearSelectorPosition.top,
               // Set month year selector position left or right
+              fontIconScale: 2.0,
+              // Set font icon scale for month year selector
             ),
             const SizedBox(
               height: 20,
             ),
-            CalendarDaySlotNavigator(
-              slotLength: 7,
-              // How many days do you want to show at a time
-              dayBoxHeightAspectRatio: 5,
-              // Set dynamic height of a day box
-              dayDisplayMode: DayDisplayMode.inDateBox,
-              // There are 2 types of design variants DayDisplayMode.outsideDateBox, DayDisplayMode.inDateBox
-              activeColor: const Color(0xffb644ae),
-              // Sets a background color for selected date.
-              deActiveColor: const Color(0xffffffff),
-              // Sets a background color for unselected date.
-              monthYearTabBorderRadius: 15,
-              // Adjusts the border radius for month and year tabs.
-              dayBoxBorderRadius: 10,
-              // Set border radius of day box
-              // Get a selected date tapped by user
-              onDateSelect: (selectedDate) {},
-              dateSelectionType: DateSelectionType.deActiveRangeDates,
-
-              /// here you can set DateSelectionType scenarios for enable & disable dates which are add in below rangeDates property
-              rangeDates: [
-                // Add your range of dates for dateSelectionType scenarios
-                DateTime(2024, 6, 9),
-                DateTime(2024, 6, 6),
-                DateTime(2024, 6, 8),
-              ],
-              fontFamilyName: "Lato",
-              // Set custom fonts or google fonts name
-              isGoogleFont: true,
-              // Set true for google fonts
-              dayBorderWidth: 0.5,
-              // Set day box border width
-              monthYearSelectorPosition: MonthYearSelectorPosition.left,
-              // Set month year selector position left or right
+            SizedBox(
+              width: 600,
+              child: CalendarDaySlotNavigator(
+                slotLength: 7,
+                dayBoxHeightAspectRatio: 6,
+                dayDisplayMode: DayDisplayMode.inDateBox,
+                activeColor: const Color(0xffb644ae),
+                deActiveColor: const Color(0xffffffff),
+                monthYearTabBorderRadius: 15,
+                dayBoxBorderRadius: 10,
+                onDateSelect: (selectedDate) {},
+                fontFamilyName: "Lato",
+                isGoogleFont: true,
+                dayBorderWidth: 0.5,
+                monthYearSelectorPosition: MonthYearSelectorPosition.left,
+              ),
             ),
           ],
         ));

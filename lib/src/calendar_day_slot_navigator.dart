@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
 
 import 'selected_date_range_widget.dart';
 
@@ -88,42 +87,47 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Position of month and year selectors in header.
   final MonthYearSelectorPosition? monthYearSelectorPosition;
 
+  /// Scale factor for icons used in the widget, if any.
+  final double? fontIconScale;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
-  const CalendarDaySlotNavigator(
-      {super.key,
-      this.slotLength = 5,
-      this.activeColor = const Color(0xffb644ae),
-      this.deActiveColor = const Color(0xffffffff),
-      this.isGradientColor = false,
-      this.activeGradientColor = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xffb644ae),
-          Color(0xffe06e6d),
-        ],
-      ),
-      this.deActiveGradientColor = const LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [
-          Color(0xffffffff),
-          Color(0xffffffff),
-        ],
-      ),
-      this.dayBoxBorderRadius = 5,
-      this.monthYearTabBorderRadius = 15,
-      this.headerText,
-      this.onDateSelect,
-      this.rangeDates = const [],
-      this.dateSelectionType = DateSelectionType.activeAllDates,
-      this.dayDisplayMode = DayDisplayMode.outsideDateBox,
-      this.fontFamilyName,
-      this.isGoogleFont = false,
-      this.dayBorderWidth = 1.0,
-      this.dayBoxHeightAspectRatio = 9,
-      this.locale = const Locale('en'),
-      this.monthYearSelectorPosition = MonthYearSelectorPosition.top});
+  const CalendarDaySlotNavigator({
+    super.key,
+    this.slotLength = 5,
+    this.activeColor = const Color(0xffb644ae),
+    this.deActiveColor = const Color(0xffffffff),
+    this.isGradientColor = false,
+    this.activeGradientColor = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xffb644ae),
+        Color(0xffe06e6d),
+      ],
+    ),
+    this.deActiveGradientColor = const LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color(0xffffffff),
+        Color(0xffffffff),
+      ],
+    ),
+    this.dayBoxBorderRadius = 5,
+    this.monthYearTabBorderRadius = 15,
+    this.headerText,
+    this.onDateSelect,
+    this.rangeDates = const [],
+    this.dateSelectionType = DateSelectionType.activeAllDates,
+    this.dayDisplayMode = DayDisplayMode.outsideDateBox,
+    this.fontFamilyName,
+    this.isGoogleFont = false,
+    this.dayBorderWidth = 1.0,
+    this.dayBoxHeightAspectRatio = 9,
+    this.locale = const Locale('en'),
+    this.monthYearSelectorPosition = MonthYearSelectorPosition.top,
+    this.fontIconScale = 1.0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,27 +137,26 @@ class CalendarDaySlotNavigator extends StatelessWidget {
         : TextStyle(fontFamily: fontFamilyName);
 
     /// Return the configured widget with its customized properties.
-    return Sizer(builder: (context, orientation, deviceType) {
-      return SelectedDateRangeWidget(
-        slotLength: slotLength,
-        activeColor: activeColor,
-        deActiveColor: deActiveColor,
-        isGradientColor: isGradientColor,
-        activeGradientColor: activeGradientColor,
-        deActiveGradientColor: deActiveGradientColor,
-        monthYearTabBorderRadius: monthYearTabBorderRadius,
-        dayBoxBorderRadius: dayBoxBorderRadius,
-        headerText: headerText,
-        onDateSelect: onDateSelect,
-        rangeDates: rangeDates,
-        dateSelectionType: dateSelectionType,
-        dayDisplayMode: dayDisplayMode,
-        textStyle: textStyle,
-        dayBorderWidth: dayBorderWidth,
-        dayBoxHeightAspectRatio: dayBoxHeightAspectRatio,
-        locale: locale,
-        monthYearSelectorPosition: monthYearSelectorPosition,
-      );
-    });
+    return SelectedDateRangeWidget(
+      slotLength: slotLength,
+      activeColor: activeColor,
+      deActiveColor: deActiveColor,
+      isGradientColor: isGradientColor,
+      activeGradientColor: activeGradientColor,
+      deActiveGradientColor: deActiveGradientColor,
+      monthYearTabBorderRadius: monthYearTabBorderRadius,
+      dayBoxBorderRadius: dayBoxBorderRadius,
+      headerText: headerText,
+      onDateSelect: onDateSelect,
+      rangeDates: rangeDates,
+      dateSelectionType: dateSelectionType,
+      dayDisplayMode: dayDisplayMode,
+      textStyle: textStyle,
+      dayBorderWidth: dayBorderWidth,
+      dayBoxHeightAspectRatio: dayBoxHeightAspectRatio,
+      locale: locale,
+      monthYearSelectorPosition: monthYearSelectorPosition,
+      fontIconScale: fontIconScale,
+    );
   }
 }

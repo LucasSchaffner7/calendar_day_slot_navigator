@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mat_month_picker_dialog/mat_month_picker_dialog.dart';
-import 'package:sizer/sizer.dart';
 
 import 'calendar_day_slot_navigator.dart';
 import 'date_functions.dart';
@@ -69,6 +68,9 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Position of month and year selectors in header.
   final MonthYearSelectorPosition? monthYearSelectorPosition;
 
+  /// Scale factor for font size and icon size
+  final double? fontIconScale;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -88,7 +90,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.dayBorderWidth,
       this.dayBoxHeightAspectRatio,
       this.locale,
-      this.monthYearSelectorPosition});
+      this.monthYearSelectorPosition,
+      this.fontIconScale});
 
   @override
   State<SelectedDateRangeWidget> createState() =>
@@ -116,6 +119,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   late String _localeName =
       (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale)
           .toString();
+  double fontIconScale = 1.0;
 
   /// PageController to control the visible month.
   PageController pageController =
@@ -157,8 +161,13 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   void initState() {
     super.initState();
 
+    /// Initialize locale for date formatting based on widget property or system settings.
     _localeName = WidgetsBinding.instance.platformDispatcher.locale.toString();
 
+    /// Set the font and icon scale based on widget property or default to 1.0.
+    fontIconScale = widget.fontIconScale!;
+
+    /// Set the slot length for pagination based on widget property.
     slotLengthLocal = widget.slotLength!;
 
     /// initialize page view controller
@@ -433,14 +442,15 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
               children: [
                 Text(
                   selectMonth ?? currentMonth,
-                  style: widget.textStyle!
-                      .copyWith(color: widget.deActiveColor!, fontSize: 9.sp),
+                  style: widget.textStyle!.copyWith(
+                      color: widget.deActiveColor!,
+                      fontSize: 16 * fontIconScale),
                 ),
                 const SizedBox(width: 5),
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: widget.deActiveColor!,
-                  size: 3.w,
+                  size: 16 * fontIconScale,
                 ),
               ],
             ),
@@ -521,14 +531,15 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                 children: [
                   Text(
                     year.toString(),
-                    style: widget.textStyle!
-                        .copyWith(color: widget.deActiveColor!, fontSize: 9.sp),
+                    style: widget.textStyle!.copyWith(
+                        color: widget.deActiveColor!,
+                        fontSize: 16 * fontIconScale),
                   ),
                   const SizedBox(width: 5),
                   Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: widget.deActiveColor!,
-                    size: 3.w,
+                    size: 16 * fontIconScale,
                   ),
                 ],
               ),
@@ -560,7 +571,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                           child: Text(
                             widget.headerText!,
                             style: widget.textStyle!.copyWith(
-                                fontSize: 13.sp,
+                                fontSize: 22 * fontIconScale,
                                 color: widget.activeColor,
                                 fontWeight: FontWeight.w500),
                           ),
@@ -599,7 +610,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               ? Text(
                                   "",
                                   style: widget.textStyle!.copyWith(
-                                    fontSize: 8.sp,
+                                    fontSize: 20 * fontIconScale,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
@@ -616,11 +627,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               funcSetPreviousMonth();
                             },
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 1.w),
+                              padding: EdgeInsets.symmetric(horizontal: 1),
                               child: Icon(
                                 Icons.arrow_back_ios_outlined,
                                 color: widget.activeColor,
-                                size: 5.w,
+                                size: 16 * fontIconScale,
                               ),
                             ),
                           ),
@@ -698,8 +709,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                   style: widget
                                                                       .textStyle!
                                                                       .copyWith(
-                                                                    fontSize:
-                                                                        8.sp,
+                                                                    fontSize: 16 *
+                                                                        fontIconScale,
                                                                     color: isActive
                                                                         ? widget
                                                                             .activeColor
@@ -748,7 +759,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                               .textStyle!
                                                                               .copyWith(
                                                                             fontSize:
-                                                                                13.sp,
+                                                                                16 * fontIconScale,
                                                                             color: !isActive
                                                                                 ? widget.activeColor!.withOpacity(0.5)
                                                                                 : isSelected
@@ -835,7 +846,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                           .textStyle!
                                                                           .copyWith(
                                                                         fontSize:
-                                                                            8.sp,
+                                                                            14 *
+                                                                                fontIconScale,
                                                                         color: !isActive
                                                                             ? widget.activeColor!.withOpacity(0.5)
                                                                             : isSelected
@@ -867,7 +879,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                         fontWeight:
                                                                             FontWeight.bold,
                                                                         fontSize:
-                                                                            10.sp,
+                                                                            20 *
+                                                                                fontIconScale,
                                                                       ),
                                                                       overflow:
                                                                           TextOverflow
@@ -896,7 +909,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               ? Text(
                                   "",
                                   style: widget.textStyle!.copyWith(
-                                    fontSize: 8.sp,
+                                    fontSize: 20 * fontIconScale,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
@@ -913,11 +926,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                               funcSetNextMonth();
                             },
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 1.w),
+                              padding: EdgeInsets.symmetric(horizontal: 1),
                               child: Icon(
                                 Icons.arrow_forward_ios_outlined,
                                 color: widget.activeColor,
-                                size: 5.w,
+                                size: 16 * fontIconScale,
                               ),
                             ),
                           ),
