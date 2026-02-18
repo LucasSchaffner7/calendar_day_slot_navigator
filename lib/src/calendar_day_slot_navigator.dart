@@ -28,6 +28,17 @@ enum MonthYearSelectorPosition {
   right,
 }
 
+/// Enum to specify the starting day of the week in the calendar.
+enum WeekStartDay {
+  sunday,
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+}
+
 @immutable
 class CalendarDaySlotNavigator extends StatelessWidget {
   /// Number of days shown in each calendar day slot navigator.
@@ -90,6 +101,9 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Scale factor for icons used in the widget, if any.
   final double? fontIconScale;
 
+  /// Starting day of the week in the calendar. Only available when slotLength is 7.
+  final WeekStartDay? weekStartDay;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({
     super.key,
@@ -127,6 +141,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.locale = const Locale('en'),
     this.monthYearSelectorPosition = MonthYearSelectorPosition.top,
     this.fontIconScale = 1.0,
+    this.weekStartDay = WeekStartDay.sunday,
   });
 
   @override
@@ -157,6 +172,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       locale: locale,
       monthYearSelectorPosition: monthYearSelectorPosition,
       fontIconScale: fontIconScale,
+      weekStartDay: weekStartDay,
     );
   }
 }

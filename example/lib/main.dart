@@ -115,6 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 isGoogleFont: true,
                 dayBorderWidth: 0.5,
                 monthYearSelectorPosition: MonthYearSelectorPosition.left,
+                weekStartDay: WeekStartDay.monday,
               ),
             ),
           ],

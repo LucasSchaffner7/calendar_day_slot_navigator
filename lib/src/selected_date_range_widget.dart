@@ -71,6 +71,9 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Scale factor for font size and icon size
   final double? fontIconScale;
 
+  /// Week start day for the calendar, default is Sunday.
+  final WeekStartDay? weekStartDay;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -91,7 +94,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.dayBoxHeightAspectRatio,
       this.locale,
       this.monthYearSelectorPosition,
-      this.fontIconScale});
+      this.fontIconScale,
+      this.weekStartDay});
 
   @override
   State<SelectedDateRangeWidget> createState() =>
@@ -154,6 +158,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
       todayDate = DateTime.now();
       getDatesInMonth(todayDate, MonthType.selected);
     }
+
+    if (widget.weekStartDay != oldWidget.weekStartDay && slotLengthLocal == 7) {
+      getDatesInMonth(selectedDate, MonthType.selected);
+    }
+
     super.didUpdateWidget(oldWidget);
   }
 
@@ -235,6 +244,17 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
 
     monthSelected = date;
     yearSelected = date;
+
+    if (slotLengthLocal == 7) {
+      final int leadingEmptySlots = widget.weekStartDay == WeekStartDay.monday
+          ? firstDayOfMonth.weekday - DateTime.monday
+          : firstDayOfMonth.weekday % 7;
+
+      for (int i = 0; i < leadingEmptySlots; i++) {
+        dates.add(nullDateTime);
+        weekDays.add('');
+      }
+    }
 
     final difference = lastDayOfMonth.difference(firstDayOfMonth);
     for (int i = 0; i <= difference.inDays; i++) {
@@ -348,8 +368,17 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   funcSetPreviousMonth() {
     if (pageController.page == 0.0) {
       if (listDate.isNotEmpty) {
+        final List<DateTime> validDates = listDate
+            .expand((week) => week)
+            .where((date) => date != nullDateTime)
+            .toList();
+
+        if (validDates.isEmpty) {
+          return;
+        }
+
         DateTime varYesterdayDate =
-            listDate.first.first.subtract(const Duration(days: 1));
+            validDates.first.subtract(const Duration(days: 1));
         getDatesInMonth(varYesterdayDate, MonthType.previous);
       }
     }
@@ -359,11 +388,16 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   funcSetNextMonth() {
     if (pageController.page == listDate.length - 1) {
       if (listDate.isNotEmpty) {
-        DateTime varTomorrowDate = listDate.last
-            .where((e) => e != nullDateTime)
-            .toList()
-            .last
-            .add(const Duration(days: 1));
+        final List<DateTime> validDates = listDate
+            .expand((week) => week)
+            .where((date) => date != nullDateTime)
+            .toList();
+
+        if (validDates.isEmpty) {
+          return;
+        }
+
+        DateTime varTomorrowDate = validDates.last.add(const Duration(days: 1));
         getDatesInMonth(varTomorrowDate, MonthType.next);
       }
     }
