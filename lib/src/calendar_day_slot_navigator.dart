@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'calendar_day_slot_navigator_controller.dart';
 import 'selected_date_range_widget.dart';
 
 /// Enum for specifying different date selection behaviors.
@@ -104,6 +105,10 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Starting day of the week in the calendar. Only available when slotLength is 7.
   final WeekStartDay? weekStartDay;
 
+  /// Optional controller to programmatically control selection and stay synced
+  /// with other widgets.
+  final CalendarDaySlotNavigatorController? controller;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({
     super.key,
@@ -142,6 +147,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.monthYearSelectorPosition = MonthYearSelectorPosition.top,
     this.fontIconScale = 1.0,
     this.weekStartDay = WeekStartDay.sunday,
+    this.controller,
   });
 
   @override
@@ -173,6 +179,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       monthYearSelectorPosition: monthYearSelectorPosition,
       fontIconScale: fontIconScale,
       weekStartDay: weekStartDay,
+      controller: controller,
     );
   }
 }

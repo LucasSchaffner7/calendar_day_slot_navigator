@@ -1,6 +1,7 @@
 import 'package:calendar_day_slot_navigator/calendar_day_slot_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,6 +48,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DateTime varSelectedDate = DateTime.now();
+  final CalendarDaySlotNavigatorController _controller =
+      CalendarDaySlotNavigatorController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller.addListener(() {
+      final selected = _controller.selectedDate;
+      if (selected != null && mounted) {
+        setState(() {
+          varSelectedDate = selected;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +81,30 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Selected: ${DateFormat('y-MM-dd').format(varSelectedDate)}',
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _controller.jumpToDate(DateTime.now()),
+                    child: const Text('Today'),
+                  ),
+                  TextButton(
+                    onPressed: () => _controller.animateToDate(
+                      DateTime.now().add(const Duration(days: 10)),
+                    ),
+                    child: const Text('+10d'),
+                  ),
+                ],
+              ),
+            ),
             CalendarDaySlotNavigator(
+              controller: _controller,
               slotLength: 6,
               // How many days do you want to show at a time
               dayBoxHeightAspectRatio: 5,
@@ -103,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               width: 600,
               child: CalendarDaySlotNavigator(
+                controller: _controller,
                 slotLength: 7,
                 dayBoxHeightAspectRatio: 6,
                 dayDisplayMode: DayDisplayMode.inDateBox,

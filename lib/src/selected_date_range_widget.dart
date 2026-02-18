@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mat_month_picker_dialog/mat_month_picker_dialog.dart';
 
 import 'calendar_day_slot_navigator.dart';
+import 'calendar_day_slot_navigator_controller.dart';
 import 'date_functions.dart';
 
 /// Enum for choosing the month page index.
@@ -74,6 +75,10 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Week start day for the calendar, default is Sunday.
   final WeekStartDay? weekStartDay;
 
+  /// Optional controller to programmatically control selection and stay synced
+  /// with other widgets.
+  final CalendarDaySlotNavigatorController? controller;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -95,7 +100,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.locale,
       this.monthYearSelectorPosition,
       this.fontIconScale,
-      this.weekStartDay});
+      this.weekStartDay,
+      this.controller});
 
   @override
   State<SelectedDateRangeWidget> createState() =>
@@ -103,7 +109,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
 }
 
 /// Private State class for SelectedDateRangeWidget to manage its state.
-class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
+class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
+    implements CalendarDaySlotNavigatorHandle {
   String? dailyDate;
   DateTime? yearSelected;
   DateTime? monthSelected;
@@ -144,8 +151,33 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
     }
   }
 
+  CalendarDaySlotNavigatorController? _attachedController;
+
+  void _attachControllerIfNeeded() {
+    final newController = widget.controller;
+    if (identical(_attachedController, newController)) return;
+
+    _attachedController?.detach(this);
+    _attachedController = newController;
+    _attachedController?.attach(this);
+
+    // Don’t notify during build; defer to post-frame to avoid setState-during-build
+    // when parents listen to the controller.
+    if (_attachedController != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _attachedController?.updateSelectedDateFromWidget(selectedDate);
+      });
+    }
+  }
+
   @override
   void didUpdateWidget(covariant SelectedDateRangeWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      _attachControllerIfNeeded();
+    }
+
     if (widget.locale != oldWidget.locale) {
       _updateLocaleFromContext();
       getDatesInMonth(selectedDate, MonthType.selected);
@@ -162,8 +194,6 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
     if (widget.weekStartDay != oldWidget.weekStartDay && slotLengthLocal == 7) {
       getDatesInMonth(selectedDate, MonthType.selected);
     }
-
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -209,11 +239,13 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
         }
       },
     );
+    _attachControllerIfNeeded();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _attachControllerIfNeeded();
 
     final String oldLocale = _localeName;
     _updateLocaleFromContext();
@@ -464,6 +496,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                 selectMonth = DateFormat('MMMM', _localeName).format(selected);
                 getDatesInMonth(selected, MonthType.selected);
               });
+              // Selected month implies a new visible month; keep controller in sync.
+              _attachedController?.updateSelectedDateFromWidget(selectedDate);
             }
           },
           child: Container(
@@ -554,6 +588,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                   selectedDate = selected;
                   widget.onDateSelect!(selectedDate);
                 });
+                _attachedController?.updateSelectedDateFromWidget(selectedDate);
               }
             },
             child: Container(
@@ -587,9 +622,80 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
   }
 
   @override
+  void dispose() {
+    _attachedController?.detach(this);
+    super.dispose();
+  }
+
+  void _setSelectedDateInternal(DateTime date, {required bool notify}) {
+    selectedDate = date;
+    dateSelected = date.day;
+    dailyDate = DateFormat("d/M/yyyy", _localeName).format(date);
+
+    // Recompute list/page for the month that contains [date].
+    getDatesInMonth(date, MonthType.selected);
+
+    if (notify) {
+      widget.onDateSelect?.call(date);
+      _attachedController?.updateSelectedDateFromWidget(date);
+    }
+  }
+
+  @override
+  void jumpToDate(DateTime date, {required bool notify}) {
+    if (!mounted) return;
+    setState(() {
+      _setSelectedDateInternal(date, notify: notify);
+    });
+  }
+
+  @override
+  Future<void> animateToDate(
+    DateTime date, {
+    required Duration duration,
+    required Curve curve,
+    required bool notify,
+  }) async {
+    if (!mounted) return;
+
+    // Compute pages for the target month.
+    setState(() {
+      // We want the selection applied immediately so the highlight updates.
+      selectedDate = date;
+      dateSelected = date.day;
+      dailyDate = DateFormat("d/M/yyyy", _localeName).format(date);
+      getDatesInMonth(date, MonthType.selected);
+    });
+
+    // Wait until after current build.
+    await Future<void>.delayed(Duration.zero);
+
+    if (pageController.hasClients) {
+      await pageController.animateToPage(
+        pageIndex,
+        duration: duration,
+        curve: curve,
+      );
+    } else {
+      // Fallback.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (pageController.hasClients) {
+          pageController.jumpToPage(pageIndex);
+        }
+      });
+    }
+
+    if (notify) {
+      widget.onDateSelect?.call(date);
+      _attachedController?.updateSelectedDateFromWidget(date);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        _attachControllerIfNeeded();
         double parentWidth = constraints.maxWidth;
         return SizedBox(
             width: parentWidth,
@@ -727,6 +833,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                               widget.onDateSelect!(
                                                                   date);
                                                             }
+                                                            _attachedController
+                                                                ?.updateSelectedDateFromWidget(
+                                                                    date);
                                                           });
                                                         },
                                                   child:
