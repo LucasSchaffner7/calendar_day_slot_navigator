@@ -419,7 +419,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                       onSurface: widget.activeColor!,
                       onPrimary: widget.deActiveColor!,
                     ),
-                    dialogBackgroundColor: widget.activeColor!,
+                    dialogTheme:
+                        DialogThemeData(backgroundColor: widget.activeColor!),
                     textTheme: TextTheme(
                       headlineSmall: widget.textStyle,
                       titleLarge: widget.textStyle,
@@ -506,7 +507,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                         onSurface: widget.activeColor!,
                         surface: widget.deActiveColor!,
                       ),
-                      dialogBackgroundColor: widget.deActiveColor!,
+                      dialogTheme:
+                          DialogThemeData(backgroundColor: widget.activeColor!),
                       textTheme: TextTheme(
                         headlineSmall: widget.textStyle,
                         titleLarge: widget.textStyle,
@@ -750,7 +752,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             .activeColor
                                                                         : widget
                                                                             .activeColor!
-                                                                            .withOpacity(.5),
+                                                                            .withValues(alpha: .5),
                                                                   ),
                                                                   overflow:
                                                                       TextOverflow
@@ -769,14 +771,14 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
                                                                             border: Border.all(
                                                                               width: widget.dayBorderWidth!,
-                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withOpacity(0.1),
+                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
                                                                             ))
                                                                         : BoxDecoration(
                                                                             gradient: isSelected ? widget.activeGradientColor : widget.deActiveGradientColor,
                                                                             borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
                                                                             border: Border.all(
                                                                               width: widget.dayBorderWidth!,
-                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withOpacity(0.1),
+                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
                                                                             )),
                                                                     child:
                                                                         Center(
@@ -795,7 +797,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             fontSize:
                                                                                 16 * fontIconScale,
                                                                             color: !isActive
-                                                                                ? widget.activeColor!.withOpacity(0.5)
+                                                                                ? widget.activeColor!.withValues(alpha: 0.5)
                                                                                 : isSelected
                                                                                     ? widget.deActiveColor
                                                                                     : widget.activeColor,
@@ -838,7 +840,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             .dayBorderWidth!,
                                                                         color: !isSelected
                                                                             ? widget.activeColor!
-                                                                            : widget.activeColor!.withOpacity(0.1),
+                                                                            : widget.activeColor!.withValues(alpha: 0.1),
                                                                       ))
                                                                   : BoxDecoration(
                                                                       gradient: isSelected
@@ -856,7 +858,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             .dayBorderWidth!,
                                                                         color: !isSelected
                                                                             ? widget.activeColor!
-                                                                            : widget.activeColor!.withOpacity(0.1),
+                                                                            : widget.activeColor!.withValues(alpha: 0.1),
                                                                       )),
                                                               child: Column(
                                                                 crossAxisAlignment:
@@ -883,7 +885,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                             14 *
                                                                                 fontIconScale,
                                                                         color: !isActive
-                                                                            ? widget.activeColor!.withOpacity(0.5)
+                                                                            ? widget.activeColor!.withValues(alpha: 0.5)
                                                                             : isSelected
                                                                                 ? widget.deActiveColor
                                                                                 : widget.activeColor,
@@ -906,7 +908,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                           .textStyle!
                                                                           .copyWith(
                                                                         color: !isActive
-                                                                            ? widget.activeColor!.withOpacity(0.5)
+                                                                            ? widget.activeColor!.withValues(alpha: 0.5)
                                                                             : isSelected
                                                                                 ? widget.deActiveColor
                                                                                 : widget.activeColor,
