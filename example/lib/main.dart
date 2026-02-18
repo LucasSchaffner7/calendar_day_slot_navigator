@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onDateSelect: (selectedDate) {},
                 fontFamilyName: "Lato",
                 isGoogleFont: true,
-                dayBorderWidth: 0.5,
+                dayBorderWidth: 0,
                 monthYearSelectorPosition: MonthYearSelectorPosition.left,
                 weekStartDay: WeekStartDay.monday,
               ),

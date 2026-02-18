@@ -626,7 +626,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
 
                 // Container for navigation arrows and calendar days.
                 Container(
-                  padding: const EdgeInsets.only(top: 10),
+                  padding:
+                      EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -769,17 +770,21 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                                 ? widget.activeColor
                                                                                 : widget.deActiveColor,
                                                                             borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
-                                                                            border: Border.all(
-                                                                              width: widget.dayBorderWidth!,
-                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
-                                                                            ))
+                                                                            border: (widget.dayBorderWidth == null || widget.dayBorderWidth == 0)
+                                                                                ? null
+                                                                                : Border.all(
+                                                                                    width: widget.dayBorderWidth!,
+                                                                                    color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
+                                                                                  ))
                                                                         : BoxDecoration(
                                                                             gradient: isSelected ? widget.activeGradientColor : widget.deActiveGradientColor,
                                                                             borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
-                                                                            border: Border.all(
-                                                                              width: widget.dayBorderWidth!,
-                                                                              color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
-                                                                            )),
+                                                                            border: (widget.dayBorderWidth == null || widget.dayBorderWidth == 0)
+                                                                                ? null
+                                                                                : Border.all(
+                                                                                    width: widget.dayBorderWidth!,
+                                                                                    color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
+                                                                                  )),
                                                                     child:
                                                                         Center(
                                                                       child:
@@ -838,9 +843,12 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                               .all(
                                                                         width: widget
                                                                             .dayBorderWidth!,
-                                                                        color: !isSelected
-                                                                            ? widget.activeColor!
-                                                                            : widget.activeColor!.withValues(alpha: 0.1),
+                                                                        color: (widget.dayBorderWidth == null ||
+                                                                                widget.dayBorderWidth == 0)
+                                                                            ? widget.activeColor!.withValues(alpha: 0)
+                                                                            : !isSelected
+                                                                                ? widget.activeColor!
+                                                                                : widget.activeColor!.withValues(alpha: 0.1),
                                                                       ))
                                                                   : BoxDecoration(
                                                                       gradient: isSelected
@@ -856,9 +864,12 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                                                                               .all(
                                                                         width: widget
                                                                             .dayBorderWidth!,
-                                                                        color: !isSelected
-                                                                            ? widget.activeColor!
-                                                                            : widget.activeColor!.withValues(alpha: 0.1),
+                                                                        color: (widget.dayBorderWidth == null ||
+                                                                                widget.dayBorderWidth == 0)
+                                                                            ? widget.activeColor!.withValues(alpha: 0)
+                                                                            : !isSelected
+                                                                                ? widget.activeColor!
+                                                                                : widget.activeColor!.withValues(alpha: 0.1),
                                                                       )),
                                                               child: Column(
                                                                 crossAxisAlignment:
