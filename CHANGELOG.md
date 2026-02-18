@@ -1,3 +1,18 @@
+## 0.0.2
+
+🌎 Added localization support (locale-aware weekday/month labels).
+
+↔️ Added configurable month/year selector position (top/left/right/bottom) and option to hide header
+text.
+
+📐 Added font/icon scale customization.
+
+🗓️ Added week start day customization (e.g. Monday vs Sunday for 7-day view).
+
+⬆️ Updated `intl` to ^0.20.2.
+
+🛠️Fixed warnings / minor cleanups.
+
 ## 0.0.1
 
 🌟 Initial release of CalendarDaySlotNavigator package
