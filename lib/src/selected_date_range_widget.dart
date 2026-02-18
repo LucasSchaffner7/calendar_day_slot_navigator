@@ -66,6 +66,9 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Locale used to localize weekday and month labels.
   final Locale? locale;
 
+  /// Position of month and year selectors in header.
+  final MonthYearSelectorPosition? monthYearSelectorPosition;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -84,7 +87,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.textStyle,
       this.dayBorderWidth,
       this.dayBoxHeightAspectRatio,
-      this.locale});
+      this.locale,
+      this.monthYearSelectorPosition});
 
   @override
   State<SelectedDateRangeWidget> createState() =>
@@ -356,6 +360,185 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
     }
   }
 
+  Widget _buildMonthYearSelectors(context) {
+    return Row(
+      children: [
+        // Month selection interactive tab.
+        InkWell(
+          onTap: () async {
+            var selected = await showMonthPicker(
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: widget.activeColor!,
+                      secondary: widget.deActiveColor!,
+                      onSurface: widget.activeColor!,
+                      onPrimary: widget.deActiveColor!,
+                    ),
+                    dialogBackgroundColor: widget.activeColor!,
+                    textTheme: TextTheme(
+                      headlineSmall: widget.textStyle,
+                      titleLarge: widget.textStyle,
+                      labelSmall: widget.textStyle,
+                      bodyLarge: widget.textStyle,
+                      titleMedium: widget.textStyle,
+                      titleSmall: widget.textStyle,
+                      bodySmall: widget.textStyle,
+                      labelLarge:
+                          widget.textStyle!.copyWith(color: Colors.white),
+                      bodyMedium: widget.textStyle,
+                      displayLarge: widget.textStyle,
+                      displayMedium: widget.textStyle,
+                      displaySmall: widget.textStyle,
+                      headlineMedium: widget.textStyle,
+                      headlineLarge: widget.textStyle,
+                      labelMedium: widget.textStyle,
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: widget.activeColor!,
+                      ),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+              context: context,
+              locale: Locale.fromSubtags(languageCode: _localeName),
+              firstDate: DateTime(1900, 1, 1),
+              lastDate: DateTime(2050, 12, 31),
+              initialDate: monthSelected ?? DateTime.now(),
+            );
+            if (selected != null) {
+              dates.clear();
+              setState(() {
+                monthSelected = selected;
+                yearSelected = selected;
+                month = selected.month;
+                year = selected.year;
+                selectMonth = DateFormat('MMMM', _localeName).format(selected);
+                getDatesInMonth(selected, MonthType.selected);
+              });
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.activeColor,
+              borderRadius:
+                  BorderRadius.circular(widget.monthYearTabBorderRadius!),
+            ),
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Row(
+              children: [
+                Text(
+                  selectMonth ?? currentMonth,
+                  style: widget.textStyle!
+                      .copyWith(color: widget.deActiveColor!, fontSize: 9.sp),
+                ),
+                const SizedBox(width: 5),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: widget.deActiveColor!,
+                  size: 3.w,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        /// Year selection interactive tab
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: InkWell(
+            onTap: () async {
+              var selected = await showDatePicker(
+                builder: (context, child) {
+                  return Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: widget.activeColor!,
+                        onPrimary: widget.deActiveColor!,
+                        onSurface: widget.activeColor!,
+                        surface: widget.deActiveColor!,
+                      ),
+                      dialogBackgroundColor: widget.deActiveColor!,
+                      textTheme: TextTheme(
+                        headlineSmall: widget.textStyle,
+                        titleLarge: widget.textStyle,
+                        labelSmall: widget.textStyle,
+                        bodyLarge: widget.textStyle,
+                        titleMedium: widget.textStyle,
+                        titleSmall: widget.textStyle,
+                        bodySmall: widget.textStyle,
+                        labelLarge: widget.textStyle!
+                            .copyWith(color: widget.activeColor!),
+                        bodyMedium: widget.textStyle,
+                        displayLarge: widget.textStyle,
+                        displayMedium: widget.textStyle,
+                        displaySmall: widget.textStyle,
+                        headlineMedium: widget.textStyle,
+                        headlineLarge: widget.textStyle,
+                        labelMedium: widget.textStyle,
+                      ),
+                      textButtonTheme: TextButtonThemeData(
+                        style: TextButton.styleFrom(
+                          foregroundColor: widget.activeColor!,
+                        ),
+                      ),
+                    ),
+                    child: child!,
+                  );
+                },
+                context: context,
+                locale: Locale.fromSubtags(languageCode: _localeName),
+                firstDate: DateTime(1900, 1, 1),
+                lastDate: DateTime(2050, 12, 31),
+                initialDate: yearSelected ?? DateTime.now(),
+                initialDatePickerMode: DatePickerMode.year,
+              );
+              if (selected != null) {
+                setState(() {
+                  yearSelected = selected;
+                  year = selected.year;
+                  getDatesInMonth(selected, MonthType.selected);
+                  monthSelected = selected;
+                  selectMonth =
+                      DateFormat('MMMM', _localeName).format(selected);
+                  selectedDate = selected;
+                  widget.onDateSelect!(selectedDate);
+                });
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: widget.activeColor,
+                borderRadius:
+                    BorderRadius.circular(widget.monthYearTabBorderRadius!),
+              ),
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              child: Row(
+                children: [
+                  Text(
+                    year.toString(),
+                    style: widget.textStyle!
+                        .copyWith(color: widget.deActiveColor!, fontSize: 9.sp),
+                  ),
+                  const SizedBox(width: 5),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: widget.deActiveColor!,
+                    size: 3.w,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -366,203 +549,33 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
             child: Column(
               children: [
                 /// Header text, month and year selection tabs.
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-                  child: Row(
-                    children: [
-                      // Display header text.
-                      Expanded(
-                        child: Text(
-                          widget.headerText!,
-                          style: widget.textStyle!.copyWith(
-                              fontSize: 13.sp,
-                              color: widget.activeColor,
-                              fontWeight: FontWeight.w500),
+                if (widget.headerText != null)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+                    child: Row(
+                      children: [
+                        // Display header text.
+                        Expanded(
+                          child: Text(
+                            widget.headerText!,
+                            style: widget.textStyle!.copyWith(
+                                fontSize: 13.sp,
+                                color: widget.activeColor,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
-                      ),
 
-                      // Month selection interactive tab.
-                      InkWell(
-                        onTap: () async {
-                          var selected = await showMonthPicker(
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: widget.activeColor!,
-                                    secondary: widget.deActiveColor!,
-                                    onSurface: widget.activeColor!,
-                                    onPrimary: widget.deActiveColor!,
-                                  ),
-                                  dialogBackgroundColor: widget.activeColor!,
-                                  textTheme: TextTheme(
-                                    headlineSmall: widget.textStyle,
-                                    titleLarge: widget.textStyle,
-                                    labelSmall: widget.textStyle,
-                                    bodyLarge: widget.textStyle,
-                                    titleMedium: widget.textStyle,
-                                    titleSmall: widget.textStyle,
-                                    bodySmall: widget.textStyle,
-                                    labelLarge: widget.textStyle!
-                                        .copyWith(color: Colors.white),
-                                    bodyMedium: widget.textStyle,
-                                    displayLarge: widget.textStyle,
-                                    displayMedium: widget.textStyle,
-                                    displaySmall: widget.textStyle,
-                                    headlineMedium: widget.textStyle,
-                                    headlineLarge: widget.textStyle,
-                                    labelMedium: widget.textStyle,
-                                  ),
-                                  textButtonTheme: TextButtonThemeData(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: widget.activeColor!,
-                                    ),
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                            context: context,
-                            locale:
-                                Locale.fromSubtags(languageCode: _localeName),
-                            firstDate: DateTime(1900, 1, 1),
-                            lastDate: DateTime(2050, 12, 31),
-                            initialDate: monthSelected ?? DateTime.now(),
-                          );
-                          if (selected != null) {
-                            dates.clear();
-                            setState(() {
-                              monthSelected = selected;
-                              yearSelected = selected;
-                              month = selected.month;
-                              year = selected.year;
-                              selectMonth = DateFormat('MMMM', _localeName)
-                                  .format(selected);
-                              getDatesInMonth(selected, MonthType.selected);
-                            });
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: widget.activeColor,
-                            borderRadius: BorderRadius.circular(
-                                widget.monthYearTabBorderRadius!),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                          child: Row(
-                            children: [
-                              Text(
-                                selectMonth ?? currentMonth,
-                                style: widget.textStyle!.copyWith(
-                                    color: widget.deActiveColor!,
-                                    fontSize: 9.sp),
-                              ),
-                              const SizedBox(width: 5),
-                              Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: widget.deActiveColor!,
-                                size: 3.w,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      /// Year selection interactive tab
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: InkWell(
-                          onTap: () async {
-                            var selected = await showDatePicker(
-                              builder: (context, child) {
-                                return Theme(
-                                  data: Theme.of(context).copyWith(
-                                    colorScheme: ColorScheme.light(
-                                      primary: widget.activeColor!,
-                                      onPrimary: widget.deActiveColor!,
-                                      onSurface: widget.activeColor!,
-                                      surface: widget.deActiveColor!,
-                                    ),
-                                    dialogBackgroundColor:
-                                        widget.deActiveColor!,
-                                    textTheme: TextTheme(
-                                      headlineSmall: widget.textStyle,
-                                      titleLarge: widget.textStyle,
-                                      labelSmall: widget.textStyle,
-                                      bodyLarge: widget.textStyle,
-                                      titleMedium: widget.textStyle,
-                                      titleSmall: widget.textStyle,
-                                      bodySmall: widget.textStyle,
-                                      labelLarge: widget.textStyle!
-                                          .copyWith(color: widget.activeColor!),
-                                      bodyMedium: widget.textStyle,
-                                      displayLarge: widget.textStyle,
-                                      displayMedium: widget.textStyle,
-                                      displaySmall: widget.textStyle,
-                                      headlineMedium: widget.textStyle,
-                                      headlineLarge: widget.textStyle,
-                                      labelMedium: widget.textStyle,
-                                    ),
-                                    textButtonTheme: TextButtonThemeData(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: widget.activeColor!,
-                                      ),
-                                    ),
-                                  ),
-                                  child: child!,
-                                );
-                              },
-                              context: context,
-                              locale:
-                                  Locale.fromSubtags(languageCode: _localeName),
-                              firstDate: DateTime(1900, 1, 1),
-                              lastDate: DateTime(2050, 12, 31),
-                              initialDate: yearSelected ?? DateTime.now(),
-                              initialDatePickerMode: DatePickerMode.year,
-                            );
-                            if (selected != null) {
-                              setState(() {
-                                yearSelected = selected;
-                                year = selected.year;
-                                getDatesInMonth(selected, MonthType.selected);
-                                monthSelected = selected;
-                                selectMonth = DateFormat('MMMM', _localeName)
-                                    .format(selected);
-                                selectedDate = selected;
-                                widget.onDateSelect!(selectedDate);
-                              });
-                            }
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: widget.activeColor,
-                              borderRadius: BorderRadius.circular(
-                                  widget.monthYearTabBorderRadius!),
-                            ),
-                            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                            child: Row(
-                              children: [
-                                Text(
-                                  year.toString(),
-                                  style: widget.textStyle!.copyWith(
-                                      color: widget.deActiveColor!,
-                                      fontSize: 9.sp),
-                                ),
-                                const SizedBox(width: 5),
-                                Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: widget.deActiveColor!,
-                                  size: 3.w,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                        if (widget.monthYearSelectorPosition ==
+                            MonthYearSelectorPosition.top) ...[
+                          _buildMonthYearSelectors(context),
+                          const SizedBox(
+                            width: 12,
+                          )
+                        ],
+                      ],
+                    ),
                   ),
-                ),
 
                 // Container for navigation arrows and calendar days.
                 Container(
@@ -571,6 +584,14 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      if (widget.monthYearSelectorPosition ==
+                          MonthYearSelectorPosition.left) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: _buildMonthYearSelectors(context),
+                        ),
+                      ],
+
                       ///show previous calendar slot
                       Column(
                         children: [
@@ -902,9 +923,25 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> {
                           ),
                         ],
                       ),
+
+                      if (widget.monthYearSelectorPosition ==
+                          MonthYearSelectorPosition.right) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: _buildMonthYearSelectors(context),
+                        ),
+                      ],
                     ],
                   ),
                 ),
+
+                if (widget.monthYearSelectorPosition ==
+                    MonthYearSelectorPosition.bottom) ...[
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  _buildMonthYearSelectors(context),
+                ],
               ],
             ));
       },

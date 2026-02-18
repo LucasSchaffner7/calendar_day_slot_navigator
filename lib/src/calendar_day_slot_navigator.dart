@@ -21,6 +21,14 @@ enum DayDisplayMode {
   inDateBox,
 }
 
+/// Enum to control month and year selector position in the header.
+enum MonthYearSelectorPosition {
+  top,
+  bottom,
+  left,
+  right,
+}
+
 @immutable
 class CalendarDaySlotNavigator extends StatelessWidget {
   /// Number of days shown in each calendar day slot navigator.
@@ -77,6 +85,9 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Locale used to localize weekday and month labels.
   final Locale? locale;
 
+  /// Position of month and year selectors in header.
+  final MonthYearSelectorPosition? monthYearSelectorPosition;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator(
       {super.key,
@@ -102,7 +113,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       ),
       this.dayBoxBorderRadius = 5,
       this.monthYearTabBorderRadius = 15,
-      this.headerText = "Select Date",
+      this.headerText,
       this.onDateSelect,
       this.rangeDates = const [],
       this.dateSelectionType = DateSelectionType.activeAllDates,
@@ -111,7 +122,8 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       this.isGoogleFont = false,
       this.dayBorderWidth = 1.0,
       this.dayBoxHeightAspectRatio = 9,
-      this.locale = const Locale('en')});
+      this.locale = const Locale('en'),
+      this.monthYearSelectorPosition = MonthYearSelectorPosition.top});
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +152,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
         dayBorderWidth: dayBorderWidth,
         dayBoxHeightAspectRatio: dayBoxHeightAspectRatio,
         locale: locale,
+        monthYearSelectorPosition: monthYearSelectorPosition,
       );
     });
   }
