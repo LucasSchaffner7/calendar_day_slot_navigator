@@ -1007,46 +1007,77 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                                                                           ? widget.activeColor!
                                                                           : widget.activeColor!.withValues(alpha: 0.1),
                                                                 )),
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            FittedBox(
-                                                              fit: BoxFit.scaleDown,
-                                                              // Adjusts the text to fit the box
-                                                              child: Text(
-                                                                DateFormat('EEE', _localeName).format(date),
-                                                                style: widget.textStyle!.copyWith(
-                                                                  fontSize: 14 * fontIconScale,
-                                                                  color: !isActive
-                                                                      ? widget.activeColor!.withValues(alpha: 0.5)
-                                                                      : isSelected
-                                                                          ? widget.deActiveColor
-                                                                          : widget.activeColor,
-                                                                ),
-                                                                overflow: TextOverflow.ellipsis,
-                                                                maxLines: 1,
+                                                        child: LayoutBuilder(
+                                                          builder: (context, constraints) {
+                                                            // Force the content to respect the available height;
+                                                            // this prevents Column (RenderFlex) overflows in tight layouts.
+                                                            final maxH = constraints.maxHeight.isFinite
+                                                                ? constraints.maxHeight
+                                                                : double.infinity;
+
+                                                            // Slightly reduce the default line heights to make the
+                                                            // two-line layout more resilient to textScaleFactor.
+                                                            final weekdayStyle = widget.textStyle!.copyWith(
+                                                              fontSize: 14 * fontIconScale,
+                                                              height: 1.0,
+                                                              color: !isActive
+                                                                  ? widget.activeColor!.withValues(alpha: 0.5)
+                                                                  : isSelected
+                                                                      ? widget.deActiveColor
+                                                                      : widget.activeColor,
+                                                            );
+
+                                                            final dayStyle = widget.textStyle!.copyWith(
+                                                              fontSize: 20 * fontIconScale,
+                                                              height: 1.0,
+                                                              fontWeight: FontWeight.bold,
+                                                              color: !isActive
+                                                                  ? widget.activeColor!.withValues(alpha: 0.5)
+                                                                  : isSelected
+                                                                      ? widget.deActiveColor
+                                                                      : widget.activeColor,
+                                                            );
+
+                                                            return ConstrainedBox(
+                                                              constraints: BoxConstraints(
+                                                                // If we have a finite height, keep the inner Column
+                                                                // from asking for more than it can get.
+                                                                maxHeight: maxH,
                                                               ),
-                                                            ),
-                                                            FittedBox(
-                                                              fit: BoxFit.scaleDown,
-                                                              // Adjusts the text to fit the box
-                                                              child: Text(
-                                                                date.day.toString(),
-                                                                style: widget.textStyle!.copyWith(
-                                                                  color: !isActive
-                                                                      ? widget.activeColor!.withValues(alpha: 0.5)
-                                                                      : isSelected
-                                                                          ? widget.deActiveColor
-                                                                          : widget.activeColor,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 20 * fontIconScale,
+                                                              child: Center(
+                                                                child: Column(
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    Flexible(
+                                                                      child: FittedBox(
+                                                                        fit: BoxFit.scaleDown,
+                                                                        child: Text(
+                                                                          DateFormat('EEE', _localeName).format(date),
+                                                                          style: weekdayStyle,
+                                                                          overflow: TextOverflow.ellipsis,
+                                                                          maxLines: 1,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(height: 2),
+                                                                    Flexible(
+                                                                      child: FittedBox(
+                                                                        fit: BoxFit.scaleDown,
+                                                                        child: Text(
+                                                                          date.day.toString(),
+                                                                          style: dayStyle,
+                                                                          overflow: TextOverflow.ellipsis,
+                                                                          maxLines: 1,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
                                                                 ),
-                                                                overflow: TextOverflow.ellipsis,
-                                                                maxLines: 1,
                                                               ),
-                                                            ),
-                                                          ],
+                                                            );
+                                                          },
                                                         ),
                                                       ),
                                           ),
