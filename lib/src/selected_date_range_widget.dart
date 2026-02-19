@@ -104,13 +104,11 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.controller});
 
   @override
-  State<SelectedDateRangeWidget> createState() =>
-      _SelectedDateRangeWidgetState();
+  State<SelectedDateRangeWidget> createState() => _SelectedDateRangeWidgetState();
 }
 
 /// Private State class for SelectedDateRangeWidget to manage its state.
-class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
-    implements CalendarDaySlotNavigatorHandle {
+class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> implements CalendarDaySlotNavigatorHandle {
   String? dailyDate;
   DateTime? yearSelected;
   DateTime? monthSelected;
@@ -127,25 +125,20 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
   DateTime nullDateTime = DateTime(0001, 1, 1);
   DateTime selectedDate = DateTime.now();
   DateTime todayDate = DateTime.now();
-  late String _localeName =
-      (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale)
-          .toString();
+  late String _localeName = (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale).toString();
   double fontIconScale = 1.0;
 
   /// PageController to control the visible month.
-  PageController pageController =
-      PageController(viewportFraction: 1, keepPage: true);
+  PageController pageController = PageController(viewportFraction: 1, keepPage: true);
   String? selectMonth;
   String? selectYear;
-  late final currentMonth =
-      DateFormat('MMMM', _localeName).format(DateTime.now());
+  late final currentMonth = DateFormat('MMMM', _localeName).format(DateTime.now());
 
   int slotLengthLocal = 0;
 
   void _updateLocaleFromContext() {
-    final String resolvedLocale = (Localizations.maybeLocaleOf(context) ??
-            WidgetsBinding.instance.platformDispatcher.locale)
-        .toString();
+    final String resolvedLocale =
+        (Localizations.maybeLocaleOf(context) ?? WidgetsBinding.instance.platformDispatcher.locale).toString();
     if (resolvedLocale != _localeName) {
       _localeName = resolvedLocale;
     }
@@ -221,16 +214,14 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
     /// Add listener to update arrows based on page position.
     pageController.addListener(
       () {
-        if ((pageController.position.pixels ==
-            pageController.position.maxScrollExtent)) {
+        if ((pageController.position.pixels == pageController.position.maxScrollExtent)) {
           isNextArrow = true;
           setState(() {});
         } else {
           isNextArrow = false;
           setState(() {});
         }
-        if ((pageController.position.pixels ==
-            pageController.position.minScrollExtent)) {
+        if ((pageController.position.pixels == pageController.position.minScrollExtent)) {
           isPreviousArrow = true;
           setState(() {});
         } else {
@@ -264,8 +255,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
     DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
     DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 0);
 
-    if (date.month == DateTime.now().month &&
-        date.year == DateTime.now().year) {
+    if (date.month == DateTime.now().month && date.year == DateTime.now().year) {
       dateSelected = DateTime.now().day;
     }
 
@@ -299,9 +289,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
     for (var i = 0; i < pageLength; i++) {
       var localList = dates.sublist(
         i * slotLengthLocal,
-        (i * slotLengthLocal + slotLengthLocal) > dates.length
-            ? dates.length
-            : (i * slotLengthLocal + slotLengthLocal),
+        (i * slotLengthLocal + slotLengthLocal) > dates.length ? dates.length : (i * slotLengthLocal + slotLengthLocal),
       );
 
       // Add remaining dates in slots if any.
@@ -328,8 +316,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
         {
           int currentDatePageIndex = -1;
           for (int i = 0; i < listDate.length; i++) {
-            if (listDate[i]
-                .contains(DateTime(date.year, date.month, date.day))) {
+            if (listDate[i].contains(DateTime(date.year, date.month, date.day))) {
               currentDatePageIndex = i;
               break;
             }
@@ -376,20 +363,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
         return DateFunctions.isTodayAndFutureDate(date);
 
       case DateSelectionType.activeRangeDates:
-        return (widget.rangeDates!
-                .where((e) => DateFunctions.isSameDates(e, date))
-                .toList()
-                .isNotEmpty)
-            ? true
-            : false;
+        return (widget.rangeDates!.where((e) => DateFunctions.isSameDates(e, date)).toList().isNotEmpty) ? true : false;
 
       case DateSelectionType.deActiveRangeDates:
-        return (widget.rangeDates!
-                .where((e) => DateFunctions.isSameDates(e, date))
-                .toList()
-                .isNotEmpty)
-            ? false
-            : true;
+        return (widget.rangeDates!.where((e) => DateFunctions.isSameDates(e, date)).toList().isNotEmpty) ? false : true;
 
       default:
         return true;
@@ -400,17 +377,14 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
   funcSetPreviousMonth() {
     if (pageController.page == 0.0) {
       if (listDate.isNotEmpty) {
-        final List<DateTime> validDates = listDate
-            .expand((week) => week)
-            .where((date) => date != nullDateTime)
-            .toList();
+        final List<DateTime> validDates =
+            listDate.expand((week) => week).where((date) => date != nullDateTime).toList();
 
         if (validDates.isEmpty) {
           return;
         }
 
-        DateTime varYesterdayDate =
-            validDates.first.subtract(const Duration(days: 1));
+        DateTime varYesterdayDate = validDates.first.subtract(const Duration(days: 1));
         getDatesInMonth(varYesterdayDate, MonthType.previous);
       }
     }
@@ -420,10 +394,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
   funcSetNextMonth() {
     if (pageController.page == listDate.length - 1) {
       if (listDate.isNotEmpty) {
-        final List<DateTime> validDates = listDate
-            .expand((week) => week)
-            .where((date) => date != nullDateTime)
-            .toList();
+        final List<DateTime> validDates =
+            listDate.expand((week) => week).where((date) => date != nullDateTime).toList();
 
         if (validDates.isEmpty) {
           return;
@@ -451,8 +423,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                       onSurface: widget.activeColor!,
                       onPrimary: widget.deActiveColor!,
                     ),
-                    dialogTheme:
-                        DialogThemeData(backgroundColor: widget.activeColor!),
+                    dialogTheme: DialogThemeData(backgroundColor: widget.activeColor!),
                     textTheme: TextTheme(
                       headlineSmall: widget.textStyle,
                       titleLarge: widget.textStyle,
@@ -461,8 +432,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                       titleMedium: widget.textStyle,
                       titleSmall: widget.textStyle,
                       bodySmall: widget.textStyle,
-                      labelLarge:
-                          widget.textStyle!.copyWith(color: Colors.white),
+                      labelLarge: widget.textStyle!.copyWith(color: Colors.white),
                       bodyMedium: widget.textStyle,
                       displayLarge: widget.textStyle,
                       displayMedium: widget.textStyle,
@@ -503,23 +473,20 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
           child: Container(
             decoration: BoxDecoration(
               color: widget.activeColor,
-              borderRadius:
-                  BorderRadius.circular(widget.monthYearTabBorderRadius!),
+              borderRadius: BorderRadius.circular(widget.monthYearTabBorderRadius!),
             ),
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: Row(
               children: [
                 Text(
                   selectMonth ?? currentMonth,
-                  style: widget.textStyle!.copyWith(
-                      color: widget.deActiveColor!,
-                      fontSize: 16 * fontIconScale),
+                  style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale),
                 ),
                 const SizedBox(width: 5),
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: widget.deActiveColor!,
-                  size: 16 * fontIconScale,
+                  size: 20 * fontIconScale,
                 ),
               ],
             ),
@@ -541,8 +508,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                         onSurface: widget.activeColor!,
                         surface: widget.deActiveColor!,
                       ),
-                      dialogTheme:
-                          DialogThemeData(backgroundColor: widget.activeColor!),
+                      dialogTheme: DialogThemeData(backgroundColor: widget.activeColor!),
                       textTheme: TextTheme(
                         headlineSmall: widget.textStyle,
                         titleLarge: widget.textStyle,
@@ -551,8 +517,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                         titleMedium: widget.textStyle,
                         titleSmall: widget.textStyle,
                         bodySmall: widget.textStyle,
-                        labelLarge: widget.textStyle!
-                            .copyWith(color: widget.activeColor!),
+                        labelLarge: widget.textStyle!.copyWith(color: widget.activeColor!),
                         bodyMedium: widget.textStyle,
                         displayLarge: widget.textStyle,
                         displayMedium: widget.textStyle,
@@ -583,8 +548,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                   year = selected.year;
                   getDatesInMonth(selected, MonthType.selected);
                   monthSelected = selected;
-                  selectMonth =
-                      DateFormat('MMMM', _localeName).format(selected);
+                  selectMonth = DateFormat('MMMM', _localeName).format(selected);
                   selectedDate = selected;
                   widget.onDateSelect!(selectedDate);
                 });
@@ -594,23 +558,20 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
             child: Container(
               decoration: BoxDecoration(
                 color: widget.activeColor,
-                borderRadius:
-                    BorderRadius.circular(widget.monthYearTabBorderRadius!),
+                borderRadius: BorderRadius.circular(widget.monthYearTabBorderRadius!),
               ),
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               child: Row(
                 children: [
                   Text(
                     year.toString(),
-                    style: widget.textStyle!.copyWith(
-                        color: widget.deActiveColor!,
-                        fontSize: 16 * fontIconScale),
+                    style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale),
                   ),
                   const SizedBox(width: 5),
                   Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: widget.deActiveColor!,
-                    size: 16 * fontIconScale,
+                    size: 20 * fontIconScale,
                   ),
                 ],
               ),
@@ -691,21 +652,65 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
     }
   }
 
+  double _clampDouble(double value, double min, double max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
+  double _preferredDayRowHeightFor(double availableWidth) {
+    // Treat dayBoxHeightAspectRatio as a *preference*.
+    // Historically this widget used an AspectRatio; that breaks in tight height
+    // constraints (e.g. inside a pill container). We convert it into a preferred
+    // height based on the available width.
+    final double ratio = (widget.dayBoxHeightAspectRatio ?? 9).toDouble();
+    final double clampedRatio = _clampDouble(ratio, 1.5, 9.0);
+
+    // Approximate the width available to the PageView by removing arrows.
+    // This doesn’t need to be exact; it’s only used as a preferred height.
+    const double arrowWidth = 36;
+    final double pageWidth = (availableWidth - (arrowWidth * 2)).clamp(0.0, availableWidth);
+
+    // Same behavior as AspectRatio (width / height = aspectRatio).
+    final double preferredHeight = pageWidth == 0 ? 0 : (pageWidth / clampedRatio);
+
+    // Keep a sensible min/max so it stays tappable.
+    return _clampDouble(preferredHeight, 40.0, 96.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         _attachControllerIfNeeded();
-        double parentWidth = constraints.maxWidth;
+
+        final double parentWidth = constraints.maxWidth;
+        final double maxHeight = constraints.hasBoundedHeight ? constraints.maxHeight : double.infinity;
+
+        // Reserve room for the optional bottom month/year selectors.
+        final bool hasBottomSelectors = widget.monthYearSelectorPosition == MonthYearSelectorPosition.bottom;
+        final double bottomSelectorsReserve = hasBottomSelectors ? 52.0 : 0.0;
+
+        final double preferredDayRowHeight = _preferredDayRowHeightFor(parentWidth);
+        final double availableForDayRow =
+            maxHeight.isFinite ? (maxHeight - bottomSelectorsReserve) : preferredDayRowHeight;
+
+        // If we’re in a tight container, shrink the day row instead of overflowing.
+        final double dayRowHeight = availableForDayRow.isFinite
+            ? _clampDouble(preferredDayRowHeight, 32.0, availableForDayRow)
+            : preferredDayRowHeight;
+
+        const double arrowWidth = 36.0;
+
         return SizedBox(
             width: parentWidth,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 /// Header text, month and year selection tabs.
                 if (widget.headerText != null)
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
                     child: Row(
                       children: [
                         // Display header text.
@@ -713,14 +718,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                           child: Text(
                             widget.headerText!,
                             style: widget.textStyle!.copyWith(
-                                fontSize: 22 * fontIconScale,
-                                color: widget.activeColor,
-                                fontWeight: FontWeight.w500),
+                                fontSize: 22 * fontIconScale, color: widget.activeColor, fontWeight: FontWeight.w500),
                           ),
                         ),
 
-                        if (widget.monthYearSelectorPosition ==
-                            MonthYearSelectorPosition.top) ...[
+                        if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.top) ...[
                           _buildMonthYearSelectors(context),
                           const SizedBox(
                             width: 12,
@@ -732,61 +734,49 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
 
                 // Container for navigation arrows and calendar days.
                 Container(
-                  padding:
-                      EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
+                  padding: EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (widget.monthYearSelectorPosition ==
-                          MonthYearSelectorPosition.left) ...[
+                      if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left) ...[
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: _buildMonthYearSelectors(context),
                         ),
                       ],
 
-                      ///show previous calendar slot
-                      Column(
-                        children: [
-                          widget.dayDisplayMode == DayDisplayMode.outsideDateBox
-                              ? Text(
-                                  "",
-                                  style: widget.textStyle!.copyWith(
-                                    fontSize: 20 * fontIconScale,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                )
-                              : const SizedBox(),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                pageController.previousPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.ease,
-                                );
-                              });
+                      // Previous button
+                      SizedBox(
+                        width: arrowWidth,
+                        height: dayRowHeight,
+                        child: Center(
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(
+                              width: arrowWidth,
+                              height: arrowWidth,
+                            ),
+                            onPressed: () {
+                              pageController.previousPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.ease,
+                              );
                               funcSetPreviousMonth();
                             },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 1),
-                              child: Icon(
-                                Icons.arrow_back_ios_outlined,
-                                color: widget.activeColor,
-                                size: 16 * fontIconScale,
-                              ),
+                            icon: Icon(
+                              Icons.arrow_back_ios_outlined,
+                              color: widget.activeColor,
+                              size: 20 * fontIconScale,
                             ),
                           ),
-                        ],
+                        ),
                       ),
 
                       /// Display the calendar day slots within a PageView builder.
                       Expanded(
-                        child: AspectRatio(
-                          aspectRatio: widget.dayBoxHeightAspectRatio! > 9
-                              ? 9
-                              : widget.dayBoxHeightAspectRatio!,
+                        child: SizedBox(
+                          height: dayRowHeight,
                           child: PageView.builder(
                             controller: pageController,
                             itemCount: listDate.length,
@@ -794,263 +784,193 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                               return Row(
                                 children: listDate[index].map((date) {
                                   bool isActive = isDateActive(date);
-                                  bool isSelected = date.day ==
-                                              selectedDate.day &&
+                                  bool isSelected = date.day == selectedDate.day &&
                                           date.month == selectedDate.month &&
                                           date.year == selectedDate.year
                                       ? true
                                       : false;
 
-                                  if (date.day == selectedDate.day &&
-                                      !isActive) {
+                                  if (date.day == selectedDate.day && !isActive) {
                                     isSelected = false;
                                   }
 
                                   return Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5, right: 5),
-                                      child:
-                                          DateFormat('yyyy', _localeName)
-                                                      .format(date) ==
-                                                  "0001"
-                                              ? const SizedBox()
-                                              : GestureDetector(
-                                                  onTap: !isActive
-                                                      ? null
-                                                      : () {
-                                                          setState(() {
-                                                            selectedDate = date;
-                                                            dateSelected =
-                                                                date.day;
-                                                            dailyDate = DateFormat(
-                                                                    "d/M/yyyy",
-                                                                    _localeName)
-                                                                .format(date);
-                                                            if (widget
-                                                                    .onDateSelect !=
-                                                                null) {
-                                                              widget.onDateSelect!(
-                                                                  date);
-                                                            }
-                                                            _attachedController
-                                                                ?.updateSelectedDateFromWidget(
-                                                                    date);
-                                                          });
-                                                        },
-                                                  child:
+                                      child: Padding(
+                                    padding: const EdgeInsets.only(left: 5, right: 5),
+                                    child: DateFormat('yyyy', _localeName).format(date) == "0001"
+                                        ? const SizedBox()
+                                        : GestureDetector(
+                                            onTap: !isActive
+                                                ? null
+                                                : () {
+                                                    setState(() {
+                                                      selectedDate = date;
+                                                      dateSelected = date.day;
+                                                      dailyDate = DateFormat("d/M/yyyy", _localeName).format(date);
+                                                      if (widget.onDateSelect != null) {
+                                                        widget.onDateSelect!(date);
+                                                      }
+                                                      _attachedController?.updateSelectedDateFromWidget(date);
+                                                    });
+                                                  },
+                                            child:
 
-                                                      /// Layout 1: Display mode for day outside date box.
-                                                      widget.dayDisplayMode ==
-                                                              DayDisplayMode
-                                                                  .outsideDateBox
-                                                          ? Column(
-                                                              children: [
-                                                                Text(
-                                                                  DateFormat(
-                                                                          'EEE',
-                                                                          _localeName)
-                                                                      .format(
-                                                                          date),
-                                                                  style: widget
-                                                                      .textStyle!
-                                                                      .copyWith(
-                                                                    fontSize: 16 *
-                                                                        fontIconScale,
-                                                                    color: isActive
-                                                                        ? widget
-                                                                            .activeColor
-                                                                        : widget
-                                                                            .activeColor!
-                                                                            .withValues(alpha: .5),
-                                                                  ),
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  maxLines: 1,
-                                                                ),
-                                                                Expanded(
-                                                                  child:
-                                                                      Container(
-                                                                    decoration: !widget
-                                                                            .isGradientColor!
-                                                                        ? BoxDecoration(
-                                                                            color: isSelected
-                                                                                ? widget.activeColor
-                                                                                : widget.deActiveColor,
-                                                                            borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
-                                                                            border: (widget.dayBorderWidth == null || widget.dayBorderWidth == 0)
-                                                                                ? null
-                                                                                : Border.all(
-                                                                                    width: widget.dayBorderWidth!,
-                                                                                    color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
-                                                                                  ))
-                                                                        : BoxDecoration(
-                                                                            gradient: isSelected ? widget.activeGradientColor : widget.deActiveGradientColor,
-                                                                            borderRadius: BorderRadius.circular(widget.dayBoxBorderRadius!),
-                                                                            border: (widget.dayBorderWidth == null || widget.dayBorderWidth == 0)
-                                                                                ? null
-                                                                                : Border.all(
-                                                                                    width: widget.dayBorderWidth!,
-                                                                                    color: !isSelected ? widget.activeColor! : widget.activeColor!.withValues(alpha: 0.1),
-                                                                                  )),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          FittedBox(
-                                                                        fit: BoxFit
-                                                                            .scaleDown,
-                                                                        // Adjusts the text to fit the box
-                                                                        child:
-                                                                            Text(
-                                                                          date.day
-                                                                              .toString(),
-                                                                          style: widget
-                                                                              .textStyle!
-                                                                              .copyWith(
-                                                                            fontSize:
-                                                                                16 * fontIconScale,
-                                                                            color: !isActive
-                                                                                ? widget.activeColor!.withValues(alpha: 0.5)
-                                                                                : isSelected
-                                                                                    ? widget.deActiveColor
-                                                                                    : widget.activeColor,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          maxLines:
-                                                                              1,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 1,
-                                                                )
-                                                              ],
-                                                            )
-                                                          :
-
-                                                          /// Layout 2: Display mode for day inside date box.
-                                                          Container(
-                                                              decoration: !widget
-                                                                      .isGradientColor!
+                                                /// Layout 1: Display mode for day outside date box.
+                                                widget.dayDisplayMode == DayDisplayMode.outsideDateBox
+                                                    ? Column(
+                                                        children: [
+                                                          Text(
+                                                            DateFormat('EEE', _localeName).format(date),
+                                                            style: widget.textStyle!.copyWith(
+                                                              fontSize: 16 * fontIconScale,
+                                                              color: isActive
+                                                                  ? widget.activeColor
+                                                                  : widget.activeColor!.withValues(alpha: .5),
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                          Expanded(
+                                                            child: Container(
+                                                              decoration: !widget.isGradientColor!
                                                                   ? BoxDecoration(
                                                                       color: isSelected
-                                                                          ? widget
-                                                                              .activeColor
-                                                                          : widget
-                                                                              .deActiveColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(widget
-                                                                              .dayBoxBorderRadius!),
-                                                                      border:
-                                                                          Border
-                                                                              .all(
-                                                                        width: widget
-                                                                            .dayBorderWidth!,
-                                                                        color: (widget.dayBorderWidth == null ||
-                                                                                widget.dayBorderWidth == 0)
-                                                                            ? widget.activeColor!.withValues(alpha: 0)
-                                                                            : !isSelected
-                                                                                ? widget.activeColor!
-                                                                                : widget.activeColor!.withValues(alpha: 0.1),
-                                                                      ))
+                                                                          ? widget.activeColor
+                                                                          : widget.deActiveColor,
+                                                                      borderRadius: BorderRadius.circular(
+                                                                          widget.dayBoxBorderRadius!),
+                                                                      border: (widget.dayBorderWidth == null ||
+                                                                              widget.dayBorderWidth == 0)
+                                                                          ? null
+                                                                          : Border.all(
+                                                                              width: widget.dayBorderWidth!,
+                                                                              color: !isSelected
+                                                                                  ? widget.activeColor!
+                                                                                  : widget.activeColor!
+                                                                                      .withValues(alpha: 0.1),
+                                                                            ))
                                                                   : BoxDecoration(
                                                                       gradient: isSelected
-                                                                          ? widget
-                                                                              .activeGradientColor
-                                                                          : widget
-                                                                              .deActiveGradientColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(widget
-                                                                              .dayBoxBorderRadius!),
-                                                                      border:
-                                                                          Border
-                                                                              .all(
-                                                                        width: widget
-                                                                            .dayBorderWidth!,
-                                                                        color: (widget.dayBorderWidth == null ||
-                                                                                widget.dayBorderWidth == 0)
-                                                                            ? widget.activeColor!.withValues(alpha: 0)
-                                                                            : !isSelected
-                                                                                ? widget.activeColor!
-                                                                                : widget.activeColor!.withValues(alpha: 0.1),
-                                                                      )),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  FittedBox(
-                                                                    fit: BoxFit
-                                                                        .scaleDown,
-                                                                    // Adjusts the text to fit the box
-                                                                    child: Text(
-                                                                      DateFormat(
-                                                                              'EEE',
-                                                                              _localeName)
-                                                                          .format(
-                                                                              date),
-                                                                      style: widget
-                                                                          .textStyle!
-                                                                          .copyWith(
-                                                                        fontSize:
-                                                                            14 *
-                                                                                fontIconScale,
-                                                                        color: !isActive
-                                                                            ? widget.activeColor!.withValues(alpha: 0.5)
-                                                                            : isSelected
-                                                                                ? widget.deActiveColor
-                                                                                : widget.activeColor,
-                                                                      ),
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
+                                                                          ? widget.activeGradientColor
+                                                                          : widget.deActiveGradientColor,
+                                                                      borderRadius: BorderRadius.circular(
+                                                                          widget.dayBoxBorderRadius!),
+                                                                      border: (widget.dayBorderWidth == null ||
+                                                                              widget.dayBorderWidth == 0)
+                                                                          ? null
+                                                                          : Border.all(
+                                                                              width: widget.dayBorderWidth!,
+                                                                              color: !isSelected
+                                                                                  ? widget.activeColor!
+                                                                                  : widget.activeColor!
+                                                                                      .withValues(alpha: 0.1),
+                                                                            )),
+                                                              child: Center(
+                                                                child: FittedBox(
+                                                                  fit: BoxFit.scaleDown,
+                                                                  // Adjusts the text to fit the box
+                                                                  child: Text(
+                                                                    date.day.toString(),
+                                                                    style: widget.textStyle!.copyWith(
+                                                                      fontSize: 16 * fontIconScale,
+                                                                      color: !isActive
+                                                                          ? widget.activeColor!.withValues(alpha: 0.5)
+                                                                          : isSelected
+                                                                              ? widget.deActiveColor
+                                                                              : widget.activeColor,
+                                                                      fontWeight: FontWeight.bold,
                                                                     ),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                    maxLines: 1,
                                                                   ),
-                                                                  FittedBox(
-                                                                    fit: BoxFit
-                                                                        .scaleDown,
-                                                                    // Adjusts the text to fit the box
-                                                                    child: Text(
-                                                                      date.day
-                                                                          .toString(),
-                                                                      style: widget
-                                                                          .textStyle!
-                                                                          .copyWith(
-                                                                        color: !isActive
-                                                                            ? widget.activeColor!.withValues(alpha: 0.5)
-                                                                            : isSelected
-                                                                                ? widget.deActiveColor
-                                                                                : widget.activeColor,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontSize:
-                                                                            20 *
-                                                                                fontIconScale,
-                                                                      ),
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                    ),
-                                                                  ),
-                                                                ],
+                                                                ),
                                                               ),
                                                             ),
-                                                ),
-                                    ),
-                                  );
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 1,
+                                                          )
+                                                        ],
+                                                      )
+                                                    :
+
+                                                    /// Layout 2: Display mode for day inside date box.
+                                                    Container(
+                                                        decoration: !widget.isGradientColor!
+                                                            ? BoxDecoration(
+                                                                color: isSelected
+                                                                    ? widget.activeColor
+                                                                    : widget.deActiveColor,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(widget.dayBoxBorderRadius!),
+                                                                border: Border.all(
+                                                                  width: widget.dayBorderWidth!,
+                                                                  color: (widget.dayBorderWidth == null ||
+                                                                          widget.dayBorderWidth == 0)
+                                                                      ? widget.activeColor!.withValues(alpha: 0)
+                                                                      : !isSelected
+                                                                          ? widget.activeColor!
+                                                                          : widget.activeColor!.withValues(alpha: 0.1),
+                                                                ))
+                                                            : BoxDecoration(
+                                                                gradient: isSelected
+                                                                    ? widget.activeGradientColor
+                                                                    : widget.deActiveGradientColor,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(widget.dayBoxBorderRadius!),
+                                                                border: Border.all(
+                                                                  width: widget.dayBorderWidth!,
+                                                                  color: (widget.dayBorderWidth == null ||
+                                                                          widget.dayBorderWidth == 0)
+                                                                      ? widget.activeColor!.withValues(alpha: 0)
+                                                                      : !isSelected
+                                                                          ? widget.activeColor!
+                                                                          : widget.activeColor!.withValues(alpha: 0.1),
+                                                                )),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            FittedBox(
+                                                              fit: BoxFit.scaleDown,
+                                                              // Adjusts the text to fit the box
+                                                              child: Text(
+                                                                DateFormat('EEE', _localeName).format(date),
+                                                                style: widget.textStyle!.copyWith(
+                                                                  fontSize: 14 * fontIconScale,
+                                                                  color: !isActive
+                                                                      ? widget.activeColor!.withValues(alpha: 0.5)
+                                                                      : isSelected
+                                                                          ? widget.deActiveColor
+                                                                          : widget.activeColor,
+                                                                ),
+                                                                overflow: TextOverflow.ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ),
+                                                            FittedBox(
+                                                              fit: BoxFit.scaleDown,
+                                                              // Adjusts the text to fit the box
+                                                              child: Text(
+                                                                date.day.toString(),
+                                                                style: widget.textStyle!.copyWith(
+                                                                  color: !isActive
+                                                                      ? widget.activeColor!.withValues(alpha: 0.5)
+                                                                      : isSelected
+                                                                          ? widget.deActiveColor
+                                                                          : widget.activeColor,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 20 * fontIconScale,
+                                                                ),
+                                                                overflow: TextOverflow.ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                          ),
+                                  ));
                                 }).toList(),
                               );
                             },
@@ -1058,43 +978,34 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                         ),
                       ),
 
-                      // Button to navigate to the next month or date slot.
-                      Column(
-                        children: [
-                          widget.dayDisplayMode == DayDisplayMode.outsideDateBox
-                              ? Text(
-                                  "",
-                                  style: widget.textStyle!.copyWith(
-                                    fontSize: 20 * fontIconScale,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                )
-                              : const SizedBox(),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                pageController.nextPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.ease,
-                                );
-                              });
+                      // Next button
+                      SizedBox(
+                        width: arrowWidth,
+                        height: dayRowHeight,
+                        child: Center(
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(
+                              width: arrowWidth,
+                              height: arrowWidth,
+                            ),
+                            onPressed: () {
+                              pageController.nextPage(
+                                duration: const Duration(milliseconds: 500),
+                                curve: Curves.ease,
+                              );
                               funcSetNextMonth();
                             },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 1),
-                              child: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                color: widget.activeColor,
-                                size: 16 * fontIconScale,
-                              ),
+                            icon: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: widget.activeColor,
+                              size: 20 * fontIconScale,
                             ),
                           ),
-                        ],
+                        ),
                       ),
 
-                      if (widget.monthYearSelectorPosition ==
-                          MonthYearSelectorPosition.right) ...[
+                      if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right) ...[
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: _buildMonthYearSelectors(context),
@@ -1104,12 +1015,12 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget>
                   ),
                 ),
 
-                if (widget.monthYearSelectorPosition ==
-                    MonthYearSelectorPosition.bottom) ...[
-                  const SizedBox(
-                    height: 12,
+                if (hasBottomSelectors) ...[
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildMonthYearSelectors(context),
                   ),
-                  _buildMonthYearSelectors(context),
                 ],
               ],
             ));
