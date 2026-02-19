@@ -140,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 20,
             ),
             SizedBox(
-              width: 600,
+              width: 800,
               child: CalendarDaySlotNavigator(
                 controller: _controller,
                 slotLength: 7,
