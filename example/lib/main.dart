@@ -16,13 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       locale: const Locale('fr'),
-      supportedLocales: const [
-        Locale('en'),
-        Locale('fr'),
-        Locale('es'),
-        Locale('de'),
-        Locale('it')
-      ],
+      supportedLocales: const [Locale('en'), Locale('fr'), Locale('es'), Locale('de'), Locale('it')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -48,8 +42,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DateTime varSelectedDate = DateTime.now();
-  final CalendarDaySlotNavigatorController _controller =
-      CalendarDaySlotNavigatorController();
+  final CalendarDaySlotNavigatorController _controller = CalendarDaySlotNavigatorController();
 
   @override
   void initState() {
@@ -163,6 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 dayBorderWidth: 0,
                 monthYearSelectorPosition: MonthYearSelectorPosition.left,
                 weekStartDay: WeekStartDay.monday,
+                jumpToTodayButton: true,
               ),
             ),
           ],

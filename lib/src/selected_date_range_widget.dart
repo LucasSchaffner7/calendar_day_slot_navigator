@@ -79,6 +79,9 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// with other widgets.
   final CalendarDaySlotNavigatorController? controller;
 
+  /// Whether the "Today" quick action button is shown.
+  final bool jumpToTodayButton;
+
   const SelectedDateRangeWidget(
       {super.key,
       this.slotLength,
@@ -101,7 +104,8 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.monthYearSelectorPosition,
       this.fontIconScale,
       this.weekStartDay,
-      this.controller});
+      this.controller,
+      this.jumpToTodayButton = true});
 
   @override
   State<SelectedDateRangeWidget> createState() => _SelectedDateRangeWidgetState();
@@ -407,6 +411,36 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     }
   }
 
+  void _jumpToToday({bool animate = false}) {
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
+
+    // If the controller is driving us with animateToDate, it already animates.
+    // For the inline UI button, a simple jump is the most predictable.
+    setState(() {
+      _setSelectedDateInternal(today, notify: true);
+    });
+
+    // Keep month/year tabs in sync.
+    monthSelected = today;
+    yearSelected = today;
+    month = today.month;
+    year = today.year;
+    selectMonth = DateFormat('MMMM', _localeName).format(today);
+
+    if (animate) {
+      // Best-effort animation: after paging is ready, animate to computed page.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !pageController.hasClients) return;
+        pageController.animateToPage(
+          pageIndex,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
+  }
+
   Widget _buildMonthYearSelectors(context) {
     return Row(
       children: [
@@ -578,6 +612,52 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
             ),
           ),
         ),
+
+        // Jump to today button
+        if (widget.jumpToTodayButton)
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: _jumpToToday,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  // Slightly different look: outlined pill.
+                  color: widget.deActiveColor,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: (widget.activeColor ?? Theme.of(context).colorScheme.primary),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.today_outlined,
+                      size: 18 * fontIconScale,
+                      color: widget.activeColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Today',
+                      style: widget.textStyle?.copyWith(
+                            fontSize: 14 * fontIconScale,
+                            fontWeight: FontWeight.w600,
+                            color: widget.activeColor,
+                          ) ??
+                          TextStyle(
+                            fontSize: 14 * fontIconScale,
+                            fontWeight: FontWeight.w600,
+                            color: widget.activeColor,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

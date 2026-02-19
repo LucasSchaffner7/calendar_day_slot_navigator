@@ -109,6 +109,9 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// with other widgets.
   final CalendarDaySlotNavigatorController? controller;
 
+  /// Whether the "Today" quick action button is shown.
+  final bool jumpToTodayButton;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({
     super.key,
@@ -148,14 +151,13 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.fontIconScale = 1.0,
     this.weekStartDay = WeekStartDay.sunday,
     this.controller,
+    this.jumpToTodayButton = true,
   });
 
   @override
   Widget build(BuildContext context) {
     /// Determine text style based on whether Google Fonts are used.
-    TextStyle textStyle = isGoogleFont!
-        ? GoogleFonts.getFont(fontFamilyName!)
-        : TextStyle(fontFamily: fontFamilyName);
+    TextStyle textStyle = isGoogleFont! ? GoogleFonts.getFont(fontFamilyName!) : TextStyle(fontFamily: fontFamilyName);
 
     /// Return the configured widget with its customized properties.
     return SelectedDateRangeWidget(
@@ -180,6 +182,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       fontIconScale: fontIconScale,
       weekStartDay: weekStartDay,
       controller: controller,
+      jumpToTodayButton: jumpToTodayButton,
     );
   }
 }
