@@ -744,7 +744,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     // constraints (e.g. inside a pill container). We convert it into a preferred
     // height based on the available width.
     final double ratio = (widget.dayBoxHeightAspectRatio ?? 9).toDouble();
-    final double clampedRatio = _clampDouble(ratio, 1.5, 9.0);
+    final double clampedRatio = _clampDouble(ratio, 1.5, 20.0);
 
     // Approximate the width available to the PageView by removing arrows.
     // This doesn’t need to be exact; it’s only used as a preferred height.
