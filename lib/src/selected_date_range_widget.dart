@@ -79,6 +79,13 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// with other widgets.
   final CalendarDaySlotNavigatorController? controller;
 
+  /// Label for the quick action "Jump to today" button.
+  /// If null, defaults to "Today".
+  ///
+  /// Note: This package doesn't ship its own l10n strings; to localize this
+  /// label, pass the translated string from your app.
+  final String? todayButtonText;
+
   /// Whether the "Today" quick action button is shown.
   final bool jumpToTodayButton;
 
@@ -105,6 +112,7 @@ class SelectedDateRangeWidget extends StatefulWidget {
       this.fontIconScale,
       this.weekStartDay,
       this.controller,
+      this.todayButtonText,
       this.jumpToTodayButton = true});
 
   @override
@@ -641,7 +649,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Today',
+                      widget.todayButtonText ?? 'Today',
                       style: widget.textStyle?.copyWith(
                             fontSize: 14 * fontIconScale,
                             fontWeight: FontWeight.w600,

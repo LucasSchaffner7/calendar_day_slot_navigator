@@ -109,6 +109,10 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// with other widgets.
   final CalendarDaySlotNavigatorController? controller;
 
+  /// Label for the quick action "Jump to today" button.
+  /// If null, defaults to "Today".
+  final String? todayButtonText;
+
   /// Whether the "Today" quick action button is shown.
   final bool jumpToTodayButton;
 
@@ -151,6 +155,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.fontIconScale = 1.0,
     this.weekStartDay = WeekStartDay.sunday,
     this.controller,
+    this.todayButtonText,
     this.jumpToTodayButton = true,
   });
 
@@ -182,6 +187,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       fontIconScale: fontIconScale,
       weekStartDay: weekStartDay,
       controller: controller,
+      todayButtonText: todayButtonText,
       jumpToTodayButton: jumpToTodayButton,
     );
   }

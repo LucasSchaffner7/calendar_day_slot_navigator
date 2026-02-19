@@ -157,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 monthYearSelectorPosition: MonthYearSelectorPosition.left,
                 weekStartDay: WeekStartDay.monday,
                 jumpToTodayButton: true,
+                todayButtonText: "Aujourd'hui",
               ),
             ),
           ],
