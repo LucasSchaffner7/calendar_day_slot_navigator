@@ -116,7 +116,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   final String? todayButtonText;
 
   /// Whether the "Today" quick action button is shown.
-  final bool jumpToTodayButton;
+  final bool? jumpToTodayButton;
 
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({

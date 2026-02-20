@@ -84,7 +84,7 @@ class SelectedDateRangeWidget extends StatefulWidget {
   final String? todayButtonText;
 
   /// Whether the "Today" quick action button is shown.
-  final bool jumpToTodayButton;
+  final bool? jumpToTodayButton;
 
   /// Width for day box
   final double? dayBoxWidth;
@@ -568,7 +568,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
           ),
         ),
         // Today
-        if (widget.jumpToTodayButton)
+        if (widget.jumpToTodayButton ?? true)
           Padding(
             padding: const EdgeInsets.only(left: 12),
             child: InkWell(
