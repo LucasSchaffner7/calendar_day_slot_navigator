@@ -828,14 +828,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left) ...[
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: _buildMonthYearSelectors(context),
-                            ),
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: _buildMonthYearSelectors(context),
                         ),
                       ],
 
@@ -1130,14 +1125,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                       ),
 
                       if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right) ...[
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: _buildMonthYearSelectors(context),
-                            ),
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: _buildMonthYearSelectors(context),
                         ),
                       ],
                     ],
