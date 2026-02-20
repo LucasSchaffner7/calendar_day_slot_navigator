@@ -605,9 +605,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
               },
               child: _pill(Row(children: [
                 Text(year.toString(),
-                    style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale)),
+                    style: widget.textStyle!.copyWith(
+                        color: widget.deActiveColor!, fontSize: 16 * fontIconScale, fontWeight: FontWeight.w800)),
                 const SizedBox(width: 5),
-                Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
+                Icon(Icons.keyboard_arrow_down_rounded,
+                    color: widget.deActiveColor!, size: 20 * fontIconScale, fontWeight: FontWeight.w800),
               ])),
             ),
           ),
@@ -639,7 +641,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                         overflow: TextOverflow.ellipsis,
                         style: (widget.textStyle ?? const TextStyle()).copyWith(
                           fontSize: 14 * fontIconScale,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w800,
                           color: widget.activeColor,
                         ),
                       ),
@@ -772,109 +774,106 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
         // Navigation row
         Padding(
           padding: EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: _buildMonthYearSelectors(context),
-                  ),
-
-                // ← button
-                SizedBox(
-                  width: arrowWidth,
-                  height: rowHeight,
-                  child: Center(
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                      onPressed: () {
-                        pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
-                        funcSetPreviousMonth();
-                      },
-                      icon: Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
-                    ),
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _buildMonthYearSelectors(context),
                 ),
 
-                // PageView — always gets a finite width via SizedBox
-                SizedBox(
-                  width: pageViewWidth,
-                  height: rowHeight,
-                  child: PageView.builder(
-                    controller: pageController,
-                    itemCount: listDate.length,
-                    itemBuilder: (_, index) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: listDate[index].map((date) {
-                          // Blank placeholder
-                          if (date == nullDateTime) {
-                            return SizedBox(width: cellOuter);
-                          }
-                          final bool isActive = isDateActive(date);
-                          bool isSelected = date.day == selectedDate.day &&
-                              date.month == selectedDate.month &&
-                              date.year == selectedDate.year;
-                          if (!isActive) isSelected = false;
+              // ← button
+              SizedBox(
+                width: arrowWidth,
+                height: rowHeight,
+                child: Center(
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                    onPressed: () {
+                      pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                      funcSetPreviousMonth();
+                    },
+                    icon: Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
+                  ),
+                ),
+              ),
 
-                          return SizedBox(
-                            width: cellOuter,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: cellPad),
-                              child: SizedBox(
-                                width: cellInner,
-                                child: GestureDetector(
-                                  onTap: !isActive
-                                      ? null
-                                      : () => setState(() {
-                                            selectedDate = date;
-                                            dateSelected = date.day;
-                                            dailyDate = DateFormat('d/M/yyyy', _localeName).format(date);
-                                            widget.onDateSelect?.call(date);
-                                            _attachedController?.updateSelectedDateFromWidget(date);
-                                          }),
-                                  child: widget.dayDisplayMode == DayDisplayMode.outsideDateBox
-                                      ? _outsideBox(date, isActive, isSelected)
-                                      : _insideBox(date, isActive, isSelected),
-                                ),
+              // PageView — always gets a finite width via SizedBox
+              SizedBox(
+                width: pageViewWidth,
+                height: rowHeight,
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: listDate.length,
+                  itemBuilder: (_, index) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: listDate[index].map((date) {
+                        // Blank placeholder
+                        if (date == nullDateTime) {
+                          return SizedBox(width: cellOuter);
+                        }
+                        final bool isActive = isDateActive(date);
+                        bool isSelected = date.day == selectedDate.day &&
+                            date.month == selectedDate.month &&
+                            date.year == selectedDate.year;
+                        if (!isActive) isSelected = false;
+
+                        return SizedBox(
+                          width: cellOuter,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: cellPad),
+                            child: SizedBox(
+                              width: cellInner,
+                              child: GestureDetector(
+                                onTap: !isActive
+                                    ? null
+                                    : () => setState(() {
+                                          selectedDate = date;
+                                          dateSelected = date.day;
+                                          dailyDate = DateFormat('d/M/yyyy', _localeName).format(date);
+                                          widget.onDateSelect?.call(date);
+                                          _attachedController?.updateSelectedDateFromWidget(date);
+                                        }),
+                                child: widget.dayDisplayMode == DayDisplayMode.outsideDateBox
+                                    ? _outsideBox(date, isActive, isSelected)
+                                    : _insideBox(date, isActive, isSelected),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      );
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ),
+
+              // → button
+              SizedBox(
+                width: arrowWidth,
+                height: rowHeight,
+                child: Center(
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                    onPressed: () {
+                      pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                      funcSetNextMonth();
                     },
+                    icon: Icon(Icons.arrow_forward_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
                   ),
                 ),
+              ),
 
-                // → button
-                SizedBox(
-                  width: arrowWidth,
-                  height: rowHeight,
-                  child: Center(
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                      onPressed: () {
-                        pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
-                        funcSetNextMonth();
-                      },
-                      icon: Icon(Icons.arrow_forward_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
-                    ),
-                  ),
+              if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _buildMonthYearSelectors(context),
                 ),
-
-                if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: _buildMonthYearSelectors(context),
-                  ),
-              ],
-            ),
+            ],
           ), // SingleChildScrollView
         ),
 
