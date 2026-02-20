@@ -655,210 +655,190 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      _attachControllerIfNeeded();
+    _attachControllerIfNeeded();
 
-      const double arrowWidth = 36.0;
-      final int slotCount = slotLengthLocal;
-      final double? explicitCellWidth = widget.dayBoxWidth;
-      final bool selectorsInline = widget.monthYearSelectorPosition == MonthYearSelectorPosition.left ||
-          widget.monthYearSelectorPosition == MonthYearSelectorPosition.right;
+    const double arrowWidth = 36.0;
+    final int slotCount = slotLengthLocal;
+    final double? explicitCellWidth = widget.dayBoxWidth;
+    final bool selectorsInline = widget.monthYearSelectorPosition == MonthYearSelectorPosition.left ||
+        widget.monthYearSelectorPosition == MonthYearSelectorPosition.right;
 
-      // PageView REQUIRES a finite bounded width.
-      // 1. explicit dayBoxWidth + selectors NOT inline → arrows + cells only
-      // 2. parent finite width → use it (selectors inline need the full width)
-      // 3. unbounded parent   → safe default (web / Column without explicit width)
-      const double _fallback = 320.0;
-      final double totalWidth = (explicitCellWidth != null && !selectorsInline)
-          ? (arrowWidth * 2) + (slotCount * explicitCellWidth)
-          : constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : _fallback;
+    // PageView REQUIRES a finite bounded width.
+    // Use MediaQuery for the fallback (avoids LayoutBuilder).
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final double totalWidth = (explicitCellWidth != null && !selectorsInline)
+        ? (arrowWidth * 2) + (slotCount * explicitCellWidth)
+        : screenWidth;
 
-      // Width given directly to PageView — always finite.
-      // When selectors are inline (left/right) we can't easily pre-subtract their
-      // width, so we compute pageViewWidth from the explicit cell width when set,
-      // or from totalWidth minus arrows otherwise.
-      final double pageViewWidth = explicitCellWidth != null
-          ? (slotCount * explicitCellWidth).clamp(1.0, double.infinity)
-          : (totalWidth - arrowWidth * 2).clamp(1.0, double.infinity);
+    final double pageViewWidth = explicitCellWidth != null
+        ? (slotCount * explicitCellWidth).clamp(1.0, double.infinity)
+        : (totalWidth - arrowWidth * 2).clamp(1.0, double.infinity);
 
-      // Row height
-      final double rowHeight = () {
-        final double preferred = widget.dayBoxHeight != null ? _clamp(widget.dayBoxHeight!, 24.0, 200.0) : 56.0;
-        if (constraints.hasBoundedHeight) {
-          final bool hasBottom = widget.monthYearSelectorPosition == MonthYearSelectorPosition.bottom;
-          final double avail = constraints.maxHeight - (hasBottom ? 52.0 : 0.0);
-          return _clamp(preferred, 32.0, avail.isFinite ? avail : preferred);
-        }
-        return preferred;
-      }();
+    // Row height — explicit value or stable default.
+    final double rowHeight = widget.dayBoxHeight != null ? _clamp(widget.dayBoxHeight!, 24.0, 200.0) : 56.0;
 
-      // Cell sizing
-      const double _pad = 5.0;
-      final double cellOuter;
-      final double cellPad;
-      if (explicitCellWidth != null) {
-        cellOuter = explicitCellWidth;
-        cellPad = _pad;
-      } else {
-        final double maxPad = slotCount > 0 ? (pageViewWidth / slotCount / 4).clamp(0.0, _pad) : 0.0;
-        cellPad = maxPad;
-        cellOuter = slotCount > 0 ? (pageViewWidth / slotCount) : pageViewWidth;
-      }
-      final double cellInner = (cellOuter - cellPad * 2).clamp(0.0, cellOuter);
+    // Cell sizing
+    const double _pad = 5.0;
+    final double cellOuter;
+    final double cellPad;
+    if (explicitCellWidth != null) {
+      cellOuter = explicitCellWidth;
+      cellPad = _pad;
+    } else {
+      final double maxPad = slotCount > 0 ? (pageViewWidth / slotCount / 4).clamp(0.0, _pad) : 0.0;
+      cellPad = maxPad;
+      cellOuter = slotCount > 0 ? (pageViewWidth / slotCount) : pageViewWidth;
+    }
+    final double cellInner = (cellOuter - cellPad * 2).clamp(0.0, cellOuter);
 
-      final bool hasBottom = widget.monthYearSelectorPosition == MonthYearSelectorPosition.bottom;
+    final bool hasBottom = widget.monthYearSelectorPosition == MonthYearSelectorPosition.bottom;
 
-      return SizedBox(
-        width: totalWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            if (widget.headerText != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(widget.headerText!,
-                          style: widget.textStyle!.copyWith(
-                              fontSize: 22 * fontIconScale, color: widget.activeColor, fontWeight: FontWeight.w500)),
-                    ),
-                    if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.top) ...[
-                      Flexible(
-                        fit: FlexFit.loose,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: _buildMonthYearSelectors(context),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  ],
-                ),
-              ),
-
-            // Navigation row
+    return SizedBox(
+      width: totalWidth,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header
+          if (widget.headerText != null)
             Padding(
-              padding: EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(widget.headerText!,
+                        style: widget.textStyle!.copyWith(
+                            fontSize: 22 * fontIconScale, color: widget.activeColor, fontWeight: FontWeight.w500)),
+                  ),
+                  if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.top) ...[
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
                         child: _buildMonthYearSelectors(context),
                       ),
-
-                    // ← button
-                    SizedBox(
-                      width: arrowWidth,
-                      height: rowHeight,
-                      child: Center(
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                          onPressed: () {
-                            pageController.previousPage(
-                                duration: const Duration(milliseconds: 500), curve: Curves.ease);
-                            funcSetPreviousMonth();
-                          },
-                          icon:
-                              Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
-                        ),
-                      ),
                     ),
-
-                    // PageView — always gets a finite width via SizedBox
-                    SizedBox(
-                      width: pageViewWidth,
-                      height: rowHeight,
-                      child: PageView.builder(
-                        controller: pageController,
-                        itemCount: listDate.length,
-                        itemBuilder: (_, index) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: listDate[index].map((date) {
-                              // Blank placeholder
-                              if (date == nullDateTime) {
-                                return SizedBox(width: cellOuter);
-                              }
-                              final bool isActive = isDateActive(date);
-                              bool isSelected = date.day == selectedDate.day &&
-                                  date.month == selectedDate.month &&
-                                  date.year == selectedDate.year;
-                              if (!isActive) isSelected = false;
-
-                              return SizedBox(
-                                width: cellOuter,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: cellPad),
-                                  child: SizedBox(
-                                    width: cellInner,
-                                    child: GestureDetector(
-                                      onTap: !isActive
-                                          ? null
-                                          : () => setState(() {
-                                                selectedDate = date;
-                                                dateSelected = date.day;
-                                                dailyDate = DateFormat('d/M/yyyy', _localeName).format(date);
-                                                widget.onDateSelect?.call(date);
-                                                _attachedController?.updateSelectedDateFromWidget(date);
-                                              }),
-                                      child: widget.dayDisplayMode == DayDisplayMode.outsideDateBox
-                                          ? _outsideBox(date, isActive, isSelected)
-                                          : _insideBox(date, isActive, isSelected),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      ),
-                    ),
-
-                    // → button
-                    SizedBox(
-                      width: arrowWidth,
-                      height: rowHeight,
-                      child: Center(
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                          onPressed: () {
-                            pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
-                            funcSetNextMonth();
-                          },
-                          icon: Icon(Icons.arrow_forward_ios_outlined,
-                              color: widget.activeColor, size: 20 * fontIconScale),
-                        ),
-                      ),
-                    ),
-
-                    if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: _buildMonthYearSelectors(context),
-                      ),
+                    const SizedBox(width: 12),
                   ],
-                ),
-              ), // SingleChildScrollView
+                ],
+              ),
             ),
 
-            if (hasBottom) ...[
-              const SizedBox(height: 12),
-              Align(alignment: Alignment.centerRight, child: _buildMonthYearSelectors(context)),
-            ],
+          // Navigation row
+          Padding(
+            padding: EdgeInsets.only(top: widget.headerText == null ? 0 : 10),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.left)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: _buildMonthYearSelectors(context),
+                    ),
+
+                  // ← button
+                  SizedBox(
+                    width: arrowWidth,
+                    height: rowHeight,
+                    child: Center(
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                        onPressed: () {
+                          pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                          funcSetPreviousMonth();
+                        },
+                        icon: Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
+                      ),
+                    ),
+                  ),
+
+                  // PageView — always gets a finite width via SizedBox
+                  SizedBox(
+                    width: pageViewWidth,
+                    height: rowHeight,
+                    child: PageView.builder(
+                      controller: pageController,
+                      itemCount: listDate.length,
+                      itemBuilder: (_, index) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: listDate[index].map((date) {
+                            // Blank placeholder
+                            if (date == nullDateTime) {
+                              return SizedBox(width: cellOuter);
+                            }
+                            final bool isActive = isDateActive(date);
+                            bool isSelected = date.day == selectedDate.day &&
+                                date.month == selectedDate.month &&
+                                date.year == selectedDate.year;
+                            if (!isActive) isSelected = false;
+
+                            return SizedBox(
+                              width: cellOuter,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: cellPad),
+                                child: SizedBox(
+                                  width: cellInner,
+                                  child: GestureDetector(
+                                    onTap: !isActive
+                                        ? null
+                                        : () => setState(() {
+                                              selectedDate = date;
+                                              dateSelected = date.day;
+                                              dailyDate = DateFormat('d/M/yyyy', _localeName).format(date);
+                                              widget.onDateSelect?.call(date);
+                                              _attachedController?.updateSelectedDateFromWidget(date);
+                                            }),
+                                    child: widget.dayDisplayMode == DayDisplayMode.outsideDateBox
+                                        ? _outsideBox(date, isActive, isSelected)
+                                        : _insideBox(date, isActive, isSelected),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // → button
+                  SizedBox(
+                    width: arrowWidth,
+                    height: rowHeight,
+                    child: Center(
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                        onPressed: () {
+                          pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                          funcSetNextMonth();
+                        },
+                        icon:
+                            Icon(Icons.arrow_forward_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
+                      ),
+                    ),
+                  ),
+
+                  if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.right)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: _buildMonthYearSelectors(context),
+                    ),
+                ],
+              ),
+            ), // SingleChildScrollView
+          ),
+
+          if (hasBottom) ...[
+            const SizedBox(height: 12),
+            Align(alignment: Alignment.centerRight, child: _buildMonthYearSelectors(context)),
           ],
-        ),
-      );
-    });
+        ],
+      ),
+    );
   }
 }
