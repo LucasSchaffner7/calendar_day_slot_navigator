@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'calendar_day_slot_navigator_controller.dart';
 import 'selected_date_range_widget.dart';
@@ -90,8 +89,11 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Width of the border around day boxes.
   final double? dayBorderWidth;
 
-  /// Aspect ratio for the height of day boxes.
-  final double? dayBoxHeightAspectRatio;
+  /// Width for each day box.
+  final double? dayBoxWidth;
+
+  /// Height for each day box.
+  final double? dayBoxHeight;
 
   /// Locale used to localize weekday and month labels.
   final Locale? locale;
@@ -149,7 +151,8 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.fontFamilyName,
     this.isGoogleFont = false,
     this.dayBorderWidth = 1.0,
-    this.dayBoxHeightAspectRatio = 9,
+    this.dayBoxWidth,
+    this.dayBoxHeight,
     this.locale = const Locale('en'),
     this.monthYearSelectorPosition = MonthYearSelectorPosition.top,
     this.fontIconScale = 1.0,
@@ -162,7 +165,11 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// Determine text style based on whether Google Fonts are used.
-    TextStyle textStyle = isGoogleFont! ? GoogleFonts.getFont(fontFamilyName!) : TextStyle(fontFamily: fontFamilyName);
+    ///
+    /// Note: Using `GoogleFonts.getFont` can trigger runtime attempts to load font
+    /// assets (and thus the asset manifest) in environments like Flutter web.
+    /// To keep this widget package-safe, we avoid reading asset manifests here.
+    TextStyle textStyle = TextStyle(fontFamily: fontFamilyName);
 
     /// Return the configured widget with its customized properties.
     return SelectedDateRangeWidget(
@@ -181,7 +188,8 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       dayDisplayMode: dayDisplayMode,
       textStyle: textStyle,
       dayBorderWidth: dayBorderWidth,
-      dayBoxHeightAspectRatio: dayBoxHeightAspectRatio,
+      dayBoxWidth: dayBoxWidth,
+      dayBoxHeight: dayBoxHeight,
       locale: locale,
       monthYearSelectorPosition: monthYearSelectorPosition,
       fontIconScale: fontIconScale,

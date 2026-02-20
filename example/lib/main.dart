@@ -100,8 +100,10 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: _controller,
               slotLength: 6,
               // How many days do you want to show at a time
-              dayBoxHeightAspectRatio: 5,
-              // Set dynamic height of a day box
+              dayBoxWidth: 125,
+              // Set day box width
+              dayBoxHeight: 100,
+              // Set day box height
               dayDisplayMode: DayDisplayMode.outsideDateBox,
               // There are 2 types of design variants DayDisplayMode.outsideDateBox, DayDisplayMode.inDateBox
               activeColor: const Color(0xffb644ae),
@@ -133,18 +135,17 @@ class _MyHomePageState extends State<MyHomePage> {
               // Set day box border width
               monthYearSelectorPosition: MonthYearSelectorPosition.top,
               // Set month year selector position left or right
-              fontIconScale: 2.0,
+              fontIconScale: 1.5,
               // Set font icon scale for month year selector
             ),
             const SizedBox(
               height: 20,
             ),
-            SizedBox(
-              width: 600,
+            Align(
+              alignment: Alignment.center,
               child: CalendarDaySlotNavigator(
                 controller: _controller,
                 slotLength: 7,
-                dayBoxHeightAspectRatio: 6,
                 dayDisplayMode: DayDisplayMode.inDateBox,
                 activeColor: const Color(0xffb644ae),
                 deActiveColor: const Color(0xffffffff),
@@ -158,6 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 weekStartDay: WeekStartDay.monday,
                 jumpToTodayButton: true,
                 todayButtonText: "Aujourd'hui",
+                dayBoxHeight: 50,
+                dayBoxWidth: 50,
               ),
             ),
           ],
