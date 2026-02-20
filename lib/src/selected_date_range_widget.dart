@@ -92,6 +92,10 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Height for day box
   final double? dayBoxHeight;
 
+  /// When true, hides the separate month pill and merges month + year into a
+  /// single pill that opens one date-picker dialog (month & year together).
+  final bool compactMonthYearPicker;
+
   const SelectedDateRangeWidget({
     super.key,
     this.slotLength,
@@ -118,6 +122,7 @@ class SelectedDateRangeWidget extends StatefulWidget {
     this.controller,
     this.todayButtonText,
     this.jumpToTodayButton = true,
+    this.compactMonthYearPicker = false,
   });
 
   @override
@@ -266,7 +271,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     for (int i = 0; i < pageLen; i++) {
       final end = ((i + 1) * slotLengthLocal).clamp(0, dates.length);
       final chunk = dates.sublist(i * slotLengthLocal, end);
-      while (chunk.length < slotLengthLocal) chunk.add(DateTime(0001, 1, 1));
+      while (chunk.length < slotLengthLocal) {
+        chunk.add(DateTime(0001, 1, 1));
+      }
       listDate.add(chunk);
     }
     setPage(date, type);
@@ -501,41 +508,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Month
-        InkWell(
-          onTap: () async {
-            final sel = await showMonthPicker(
-              builder: (ctx, child) => _applyTheme(ctx, child, labelColor: Colors.white),
-              context: context,
-              locale: Locale.fromSubtags(languageCode: _localeName),
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2050, 12, 31),
-              initialDate: monthSelected ?? DateTime.now(),
-            );
-            if (sel != null) {
-              dates.clear();
-              setState(() {
-                monthSelected = sel;
-                yearSelected = sel;
-                month = sel.month;
-                year = sel.year;
-                selectMonth = DateFormat('MMMM', _localeName).format(sel);
-                getDatesInMonth(sel, MonthType.selected);
-              });
-              _attachedController?.updateSelectedDateFromWidget(selectedDate);
-            }
-          },
-          child: _pill(Row(children: [
-            Text(selectMonth ?? currentMonth,
-                style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale)),
-            const SizedBox(width: 5),
-            Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
-          ])),
-        ),
-        // Year
-        Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: InkWell(
+        if (widget.compactMonthYearPicker)
+          // ── Compact: single "Month Year" pill ─────────────────────────────
+          InkWell(
             onTap: () async {
               final sel = await showDatePicker(
                 builder: (ctx, child) => _applyTheme(ctx, child, labelColor: widget.activeColor!),
@@ -543,31 +518,102 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                 locale: Locale.fromSubtags(languageCode: _localeName),
                 firstDate: DateTime(1900),
                 lastDate: DateTime(2050, 12, 31),
-                initialDate: yearSelected ?? DateTime.now(),
+                initialDate: monthSelected ?? DateTime.now(),
                 initialDatePickerMode: DatePickerMode.year,
               );
               if (sel != null) {
                 setState(() {
                   yearSelected = sel;
-                  year = sel.year;
-                  getDatesInMonth(sel, MonthType.selected);
                   monthSelected = sel;
+                  month = sel.month;
+                  year = sel.year;
                   selectMonth = DateFormat('MMMM', _localeName).format(sel);
+                  getDatesInMonth(sel, MonthType.selected);
                   selectedDate = sel;
-                  widget.onDateSelect!(selectedDate);
+                  widget.onDateSelect?.call(selectedDate);
                 });
                 _attachedController?.updateSelectedDateFromWidget(selectedDate);
               }
             },
             child: _pill(Row(children: [
-              Text(year.toString(),
+              Text(
+                '${selectMonth ?? currentMonth} $year',
+                style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale),
+              ),
+              const SizedBox(width: 5),
+              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
+            ])),
+          )
+        else ...[
+          // ── Normal: separate Month pill ───────────────────────────────────
+          InkWell(
+            onTap: () async {
+              final sel = await showMonthPicker(
+                builder: (ctx, child) => _applyTheme(ctx, child, labelColor: Colors.white),
+                context: context,
+                locale: Locale.fromSubtags(languageCode: _localeName),
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2050, 12, 31),
+                initialDate: monthSelected ?? DateTime.now(),
+              );
+              if (sel != null) {
+                dates.clear();
+                setState(() {
+                  monthSelected = sel;
+                  yearSelected = sel;
+                  month = sel.month;
+                  year = sel.year;
+                  selectMonth = DateFormat('MMMM', _localeName).format(sel);
+                  getDatesInMonth(sel, MonthType.selected);
+                });
+                _attachedController?.updateSelectedDateFromWidget(selectedDate);
+              }
+            },
+            child: _pill(Row(children: [
+              Text(selectMonth ?? currentMonth,
                   style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale)),
               const SizedBox(width: 5),
               Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
             ])),
           ),
-        ),
-        // Today
+          // ── Normal: separate Year pill ────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: InkWell(
+              onTap: () async {
+                final sel = await showDatePicker(
+                  builder: (ctx, child) => _applyTheme(ctx, child, labelColor: widget.activeColor!),
+                  context: context,
+                  locale: Locale.fromSubtags(languageCode: _localeName),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2050, 12, 31),
+                  initialDate: yearSelected ?? DateTime.now(),
+                  initialDatePickerMode: DatePickerMode.year,
+                );
+                if (sel != null) {
+                  setState(() {
+                    yearSelected = sel;
+                    year = sel.year;
+                    getDatesInMonth(sel, MonthType.selected);
+                    monthSelected = sel;
+                    selectMonth = DateFormat('MMMM', _localeName).format(sel);
+                    selectedDate = sel;
+                    widget.onDateSelect!(selectedDate);
+                  });
+                  _attachedController?.updateSelectedDateFromWidget(selectedDate);
+                }
+              },
+              child: _pill(Row(children: [
+                Text(year.toString(),
+                    style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale)),
+                const SizedBox(width: 5),
+                Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
+              ])),
+            ),
+          ),
+        ],
+
+        // ── Today button (always shown when enabled) ─────────────────────────
         if (widget.jumpToTodayButton ?? true)
           Padding(
             padding: const EdgeInsets.only(left: 12),
@@ -678,14 +724,14 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     final double rowHeight = widget.dayBoxHeight != null ? _clamp(widget.dayBoxHeight!, 24.0, 200.0) : 56.0;
 
     // Cell sizing
-    const double _pad = 5.0;
+    const double pad = 5.0;
     final double cellOuter;
     final double cellPad;
     if (explicitCellWidth != null) {
       cellOuter = explicitCellWidth;
-      cellPad = _pad;
+      cellPad = pad;
     } else {
-      final double maxPad = slotCount > 0 ? (pageViewWidth / slotCount / 4).clamp(0.0, _pad) : 0.0;
+      final double maxPad = slotCount > 0 ? (pageViewWidth / slotCount / 4).clamp(0.0, pad) : 0.0;
       cellPad = maxPad;
       cellOuter = slotCount > 0 ? (pageViewWidth / slotCount) : pageViewWidth;
     }
@@ -697,16 +743,18 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
       mainAxisSize: MainAxisSize.min,
       children: [
         // Header
-        if (widget.headerText != null)
+        if (widget.headerText != null || widget.monthYearSelectorPosition == MonthYearSelectorPosition.top)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Text(widget.headerText!,
-                      style: widget.textStyle!.copyWith(
-                          fontSize: 22 * fontIconScale, color: widget.activeColor, fontWeight: FontWeight.w500)),
-                ),
+                if (widget.headerText != null)
+                  Expanded(
+                    child: Text(widget.headerText!,
+                        style: widget.textStyle!.copyWith(
+                            fontSize: 22 * fontIconScale, color: widget.activeColor, fontWeight: FontWeight.w500)),
+                  ),
                 if (widget.monthYearSelectorPosition == MonthYearSelectorPosition.top) ...[
                   Flexible(
                     fit: FlexFit.loose,
@@ -831,8 +879,13 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
         ),
 
         if (hasBottom) ...[
-          const SizedBox(height: 12),
-          Align(alignment: Alignment.centerRight, child: _buildMonthYearSelectors(context)),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildMonthYearSelectors(context),
+            ],
+          ),
         ],
       ],
     );

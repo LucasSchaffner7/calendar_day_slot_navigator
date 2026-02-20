@@ -118,6 +118,10 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Whether the "Today" quick action button is shown.
   final bool? jumpToTodayButton;
 
+  /// When true, hides the separate month and year pills and shows a single
+  /// "Month Year" pill that opens a combined date picker.
+  final bool compactMonthYearPicker;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({
     super.key,
@@ -128,18 +132,12 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.activeGradientColor = const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        Color(0xffb644ae),
-        Color(0xffe06e6d),
-      ],
+      colors: [Color(0xffb644ae), Color(0xffe06e6d)],
     ),
     this.deActiveGradientColor = const LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
-      colors: [
-        Color(0xffffffff),
-        Color(0xffffffff),
-      ],
+      colors: [Color(0xffffffff), Color(0xffffffff)],
     ),
     this.dayBoxBorderRadius = 5,
     this.monthYearTabBorderRadius = 15,
@@ -160,6 +158,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.controller,
     this.todayButtonText,
     this.jumpToTodayButton = true,
+    this.compactMonthYearPicker = false,
   });
 
   @override
@@ -197,6 +196,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       controller: controller,
       todayButtonText: todayButtonText,
       jumpToTodayButton: jumpToTodayButton,
+      compactMonthYearPicker: compactMonthYearPicker,
     );
   }
 }

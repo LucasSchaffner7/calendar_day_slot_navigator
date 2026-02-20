@@ -161,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 todayButtonText: "Aujourd'hui",
                 dayBoxHeight: 50,
                 dayBoxWidth: 50,
+                compactMonthYearPicker: true,
               ),
             ),
           ],
