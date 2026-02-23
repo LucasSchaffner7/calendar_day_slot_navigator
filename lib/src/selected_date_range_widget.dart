@@ -241,7 +241,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     weekDays.clear();
 
     final first = DateTime(date.year, date.month, 1);
-    final last = DateTime(date.year, date.month + 1, 0);
+    // Use DateTime arithmetic instead of Duration.inDays / Duration.add to
+    // avoid DST bugs: when clocks spring forward (March) or fall back (October)
+    // the 24 h duration is off by 1 h, so diff.inDays truncates and the last
+    // few days of the month go missing.
+    final int daysInMonth = DateTime(date.year, date.month + 1, 0).day;
 
     if (date.month == DateTime.now().month && date.year == DateTime.now().year) {
       dateSelected = DateTime.now().day;
@@ -260,9 +264,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
       }
     }
 
-    final diff = last.difference(first);
-    for (int i = 0; i <= diff.inDays; i++) {
-      final d = first.add(Duration(days: i));
+    for (int i = 1; i <= daysInMonth; i++) {
+      // Construct each date directly to avoid DST-related Duration.add issues.
+      final d = DateTime(date.year, date.month, i);
       dates.add(d);
       weekDays.add(DateFormat('EEE', _localeName).format(d));
     }
@@ -331,7 +335,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     if (pageController.page == 0.0 && listDate.isNotEmpty) {
       final valid = listDate.expand((w) => w).where((d) => d != nullDateTime).toList();
       if (valid.isEmpty) return;
-      getDatesInMonth(valid.first.subtract(const Duration(days: 1)), MonthType.previous);
+      // Use explicit month arithmetic to avoid DST-related Duration.subtract issues.
+      final first = valid.first;
+      getDatesInMonth(DateTime(first.year, first.month - 1, 1), MonthType.previous);
     }
   }
 
@@ -339,7 +345,9 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
     if (pageController.page == listDate.length - 1 && listDate.isNotEmpty) {
       final valid = listDate.expand((w) => w).where((d) => d != nullDateTime).toList();
       if (valid.isEmpty) return;
-      getDatesInMonth(valid.last.add(const Duration(days: 1)), MonthType.next);
+      // Use explicit month arithmetic to avoid DST-related Duration.add issues.
+      final last = valid.last;
+      getDatesInMonth(DateTime(last.year, last.month + 1, 1), MonthType.next);
     }
   }
 
