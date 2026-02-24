@@ -96,6 +96,11 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// single pill that opens one date-picker dialog (month & year together).
   final bool compactMonthYearPicker;
 
+  /// When true, day text colors (weekday label + date number) follow the app
+  /// theme (black in light mode, white in dark mode).
+  /// When false (default), the existing activeColor / deActiveColor are used.
+  final bool useThemeColorForDayText;
+
   const SelectedDateRangeWidget({
     super.key,
     this.slotLength,
@@ -123,6 +128,7 @@ class SelectedDateRangeWidget extends StatefulWidget {
     this.todayButtonText,
     this.jumpToTodayButton = true,
     this.compactMonthYearPicker = false,
+    this.useThemeColorForDayText = false,
   });
 
   @override
@@ -424,8 +430,15 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
   }
 
   Color _labelColor(bool isActive, bool isSelected) {
-    if (!isActive) return widget.activeColor!.withValues(alpha: 0.5);
-    return isSelected ? widget.deActiveColor! : widget.activeColor!;
+    if (!isActive) {
+      return widget.useThemeColorForDayText
+          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)
+          : widget.activeColor!.withValues(alpha: 0.5);
+    }
+    if (isSelected) {
+      return widget.useThemeColorForDayText ? Theme.of(context).colorScheme.onPrimary : widget.deActiveColor!;
+    }
+    return widget.useThemeColorForDayText ? Theme.of(context).colorScheme.onSurface : widget.activeColor!;
   }
 
   // ── Layout 1: weekday outside the box ────────────────────────────────────
@@ -437,7 +450,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
           DateFormat('EEE', _localeName).format(date),
           style: widget.textStyle!.copyWith(
             fontSize: 16 * fontIconScale,
-            color: isActive ? widget.activeColor : widget.activeColor!.withValues(alpha: 0.5),
+            color: widget.useThemeColorForDayText
+                ? (isActive
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4))
+                : (isActive ? widget.activeColor : widget.activeColor!.withValues(alpha: 0.5)),
           ),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
@@ -546,10 +563,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
             child: _pill(Row(children: [
               Text(
                 '${selectMonth ?? currentMonth} $year',
-                style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale),
+                style: widget.textStyle!
+                    .copyWith(color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 5),
-              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
+              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor, size: 20 * fontIconScale),
             ])),
           )
         else ...[
@@ -579,9 +597,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
             },
             child: _pill(Row(children: [
               Text(selectMonth ?? currentMonth,
-                  style: widget.textStyle!.copyWith(color: widget.deActiveColor!, fontSize: 16 * fontIconScale)),
+                  style: widget.textStyle!.copyWith(
+                      color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold)),
               const SizedBox(width: 5),
-              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor!, size: 20 * fontIconScale),
+              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor, size: 20 * fontIconScale),
             ])),
           ),
           // ── Normal: separate Year pill ────────────────────────────────────
@@ -614,10 +633,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
               child: _pill(Row(children: [
                 Text(year.toString(),
                     style: widget.textStyle!.copyWith(
-                        color: widget.deActiveColor!, fontSize: 16 * fontIconScale, fontWeight: FontWeight.w800)),
+                        color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.w800)),
                 const SizedBox(width: 5),
                 Icon(Icons.keyboard_arrow_down_rounded,
-                    color: widget.deActiveColor!, size: 20 * fontIconScale, fontWeight: FontWeight.w800),
+                    color: widget.deActiveColor, size: 20 * fontIconScale, fontWeight: FontWeight.w800),
               ])),
             ),
           ),
@@ -640,7 +659,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.today_outlined, size: 18 * fontIconScale, color: widget.activeColor),
+                    Icon(Icons.today_outlined, size: 24 * fontIconScale, color: widget.activeColor),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
@@ -713,7 +732,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
   Widget build(BuildContext context) {
     _attachControllerIfNeeded();
 
-    const double arrowWidth = 36.0;
+    const double arrowWidth = 48.0;
     final int slotCount = slotLengthLocal;
     final double? explicitCellWidth = widget.dayBoxWidth;
     final bool selectorsInline = widget.monthYearSelectorPosition == MonthYearSelectorPosition.left ||
@@ -799,12 +818,12 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                 child: Center(
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                     onPressed: () {
                       pageController.previousPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
                       funcSetPreviousMonth();
                     },
-                    icon: Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
+                    icon: Icon(Icons.arrow_back_ios_outlined, color: widget.activeColor, size: 28 * fontIconScale),
                   ),
                 ),
               ),
@@ -866,12 +885,12 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                 child: Center(
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                    constraints: const BoxConstraints.tightFor(width: 44, height: 44),
                     onPressed: () {
                       pageController.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
                       funcSetNextMonth();
                     },
-                    icon: Icon(Icons.arrow_forward_ios_outlined, color: widget.activeColor, size: 20 * fontIconScale),
+                    icon: Icon(Icons.arrow_forward_ios_outlined, color: widget.activeColor, size: 28 * fontIconScale),
                   ),
                 ),
               ),

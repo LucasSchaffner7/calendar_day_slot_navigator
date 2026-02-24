@@ -122,6 +122,11 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// "Month Year" pill that opens a combined date picker.
   final bool compactMonthYearPicker;
 
+  /// When true, day text colors follow the app theme (black in light mode,
+  /// white in dark mode). When false (default), activeColor / deActiveColor
+  /// are used instead.
+  final bool useThemeColorForDayText;
+
   /// Constructor for CalendarDaySlotNavigator widget with optional parameters.
   const CalendarDaySlotNavigator({
     super.key,
@@ -159,6 +164,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
     this.todayButtonText,
     this.jumpToTodayButton = true,
     this.compactMonthYearPicker = false,
+    this.useThemeColorForDayText = false,
   });
 
   @override
@@ -197,6 +203,7 @@ class CalendarDaySlotNavigator extends StatelessWidget {
       todayButtonText: todayButtonText,
       jumpToTodayButton: jumpToTodayButton,
       compactMonthYearPicker: compactMonthYearPicker,
+      useThemeColorForDayText: useThemeColorForDayText,
     );
   }
 }
