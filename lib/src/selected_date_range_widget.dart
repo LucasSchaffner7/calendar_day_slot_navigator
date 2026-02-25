@@ -436,7 +436,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
           : widget.activeColor!.withValues(alpha: 0.5);
     }
     if (isSelected) {
-      return widget.useThemeColorForDayText ? Theme.of(context).colorScheme.onPrimary : widget.deActiveColor!;
+      return Colors.white;
     }
     return widget.useThemeColorForDayText ? Theme.of(context).colorScheme.onSurface : widget.activeColor!;
   }
@@ -901,7 +901,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                   child: _buildMonthYearSelectors(context),
                 ),
             ],
-          ), // SingleChildScrollView
+          ),
         ),
 
         if (hasBottom) ...[
