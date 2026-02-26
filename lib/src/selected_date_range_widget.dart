@@ -564,10 +564,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
               Text(
                 '${selectMonth ?? currentMonth} $year',
                 style: widget.textStyle!
-                    .copyWith(color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold),
+                    .copyWith(color: Colors.white, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 5),
-              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor, size: 20 * fontIconScale),
+              Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 20 * fontIconScale),
             ])),
           )
         else ...[
@@ -597,10 +597,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
             },
             child: _pill(Row(children: [
               Text(selectMonth ?? currentMonth,
-                  style: widget.textStyle!.copyWith(
-                      color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold)),
+                  style: widget.textStyle!
+                      .copyWith(color: Colors.white, fontSize: 16 * fontIconScale, fontWeight: FontWeight.bold)),
               const SizedBox(width: 5),
-              Icon(Icons.keyboard_arrow_down_rounded, color: widget.deActiveColor, size: 20 * fontIconScale),
+              Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 20 * fontIconScale),
             ])),
           ),
           // ── Normal: separate Year pill ────────────────────────────────────
@@ -632,11 +632,11 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
               },
               child: _pill(Row(children: [
                 Text(year.toString(),
-                    style: widget.textStyle!.copyWith(
-                        color: widget.deActiveColor, fontSize: 16 * fontIconScale, fontWeight: FontWeight.w800)),
+                    style: widget.textStyle!
+                        .copyWith(color: Colors.white, fontSize: 16 * fontIconScale, fontWeight: FontWeight.w800)),
                 const SizedBox(width: 5),
                 Icon(Icons.keyboard_arrow_down_rounded,
-                    color: widget.deActiveColor, size: 20 * fontIconScale, fontWeight: FontWeight.w800),
+                    color: Colors.white, size: 20 * fontIconScale, fontWeight: FontWeight.w800),
               ])),
             ),
           ),
