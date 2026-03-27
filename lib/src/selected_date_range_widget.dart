@@ -21,10 +21,10 @@ class SelectedDateRangeWidget extends StatefulWidget {
   /// Color for highlighting selected dates.
   final Color? activeColor;
 
-  /// show other dates
+  /// Color for non-selected dates.
   final Color? deActiveColor;
 
-  /// Color for non-selected dates.
+  /// Whether to use gradient colors instead of solid colors for date highlighting.
   final bool? isGradientColor;
 
   /// Gradient for selected date highlighting.
@@ -136,23 +136,26 @@ class SelectedDateRangeWidget extends StatefulWidget {
 }
 
 class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> implements CalendarDaySlotNavigatorHandle {
+  /// Sentinel value used as a placeholder when filling incomplete calendar rows
+  /// (e.g. leading blank cells before the first day of the month in week view).
+  static final DateTime _kPlaceholderDate = DateTime(1);
+
   String? dailyDate;
   DateTime? yearSelected;
   DateTime? monthSelected;
   int dateSelected = 0;
-  var month = DateTime.now().month;
+  int month = DateTime.now().month;
   List<List<DateTime>> listDate = [];
   List<DateTime> dates = [];
-  var year = DateTime.now().year;
-  var weekDays = [];
+  int year = DateTime.now().year;
+  List<String> weekDays = [];
   bool isPreviousArrow = true;
   bool isNextArrow = true;
   int days = 0;
   int pageIndex = 0;
-  DateTime nullDateTime = DateTime(0001, 1, 1);
   DateTime selectedDate = DateTime.now();
   DateTime todayDate = DateTime.now();
-  late String _localeName = (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale).toString();
+  late String _localeName;
   double fontIconScale = 1.0;
 
   late PageController pageController;
@@ -188,8 +191,8 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
   void initState() {
     super.initState();
     _localeName = (widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale).toString();
-    fontIconScale = widget.fontIconScale!;
-    slotLengthLocal = widget.slotLength!;
+    fontIconScale = widget.fontIconScale ?? 1.0;
+    slotLengthLocal = widget.slotLength ?? 5;
     pageController = PageController(viewportFraction: 1, keepPage: true);
     dateSelected = DateTime.now().day;
     currentMonth = DateFormat('MMMM', _localeName).format(DateTime.now());
@@ -223,8 +226,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
       getDatesInMonth(selectedDate, MonthType.selected);
     }
     if (widget.slotLength != oldWidget.slotLength) {
-      slotLengthLocal = widget.slotLength!;
-      nullDateTime = DateTime(0001, 1, 1);
+      slotLengthLocal = widget.slotLength ?? 5;
       selectedDate = DateTime.now();
       todayDate = DateTime.now();
       getDatesInMonth(todayDate, MonthType.selected);
@@ -265,7 +267,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
       final int leading =
           widget.weekStartDay == WeekStartDay.monday ? first.weekday - DateTime.monday : first.weekday % 7;
       for (int i = 0; i < leading; i++) {
-        dates.add(nullDateTime);
+        dates.add(_kPlaceholderDate);
         weekDays.add('');
       }
     }
@@ -282,7 +284,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
       final end = ((i + 1) * slotLengthLocal).clamp(0, dates.length);
       final chunk = dates.sublist(i * slotLengthLocal, end);
       while (chunk.length < slotLengthLocal) {
-        chunk.add(DateTime(0001, 1, 1));
+        chunk.add(_kPlaceholderDate);
       }
       listDate.add(chunk);
     }
@@ -339,7 +341,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
 
   void funcSetPreviousMonth() {
     if (pageController.page == 0.0 && listDate.isNotEmpty) {
-      final valid = listDate.expand((w) => w).where((d) => d != nullDateTime).toList();
+      final valid = listDate.expand((w) => w).where((d) => d != _kPlaceholderDate).toList();
       if (valid.isEmpty) return;
       // Use explicit month arithmetic to avoid DST-related Duration.subtract issues.
       final first = valid.first;
@@ -349,7 +351,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
 
   void funcSetNextMonth() {
     if (pageController.page == listDate.length - 1 && listDate.isNotEmpty) {
-      final valid = listDate.expand((w) => w).where((d) => d != nullDateTime).toList();
+      final valid = listDate.expand((w) => w).where((d) => d != _kPlaceholderDate).toList();
       if (valid.isEmpty) return;
       // Use explicit month arithmetic to avoid DST-related Duration.add issues.
       final last = valid.last;
@@ -359,12 +361,10 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
 
   void _jumpToToday() {
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    setState(() => _setSelectedDateInternal(today, notify: true));
-    monthSelected = today;
-    yearSelected = today;
-    month = today.month;
-    year = today.year;
-    selectMonth = DateFormat('MMMM', _localeName).format(today);
+    setState(() {
+      month = today.month;
+      _setSelectedDateInternal(today, notify: true);
+    });
   }
 
   void _setSelectedDateInternal(DateTime date, {required bool notify}) {
@@ -625,7 +625,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                     monthSelected = sel;
                     selectMonth = DateFormat('MMMM', _localeName).format(sel);
                     selectedDate = sel;
-                    widget.onDateSelect!(selectedDate);
+                    widget.onDateSelect?.call(selectedDate);
                   });
                   _attachedController?.updateSelectedDateFromWidget(selectedDate);
                 }
@@ -840,7 +840,7 @@ class _SelectedDateRangeWidgetState extends State<SelectedDateRangeWidget> imple
                       mainAxisSize: MainAxisSize.min,
                       children: listDate[index].map((date) {
                         // Blank placeholder
-                        if (date == nullDateTime) {
+                        if (date == _kPlaceholderDate) {
                           return SizedBox(width: cellOuter);
                         }
                         final bool isActive = isDateActive(date);
