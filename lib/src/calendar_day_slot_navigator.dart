@@ -50,19 +50,19 @@ class CalendarDaySlotNavigator extends StatelessWidget {
   /// Color for non-selected dates.
   final Color? deActiveColor;
 
-  /// Gradient for highlighted selected dates.
+  /// Whether to use gradient colors instead of solid colors for date highlighting.
   final bool? isGradientColor;
 
-  /// Gradient for non-selected dates.
+  /// Gradient for highlighted selected dates.
   final LinearGradient? activeGradientColor;
 
-  /// Border radius for each day box.
+  /// Gradient for non-selected dates.
   final LinearGradient? deActiveGradientColor;
 
-  /// Border radius for month and year selection tabs.
+  /// Border radius for each day box.
   final double? dayBoxBorderRadius;
 
-  /// Custom header text for the widget.
+  /// Border radius for month and year selection tabs.
   final double? monthYearTabBorderRadius;
 
   /// Custom header text for the widget.
